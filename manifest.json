@@ -1,0 +1,22 @@
+{
+  "name": "GPay Premium",
+  "short_name": "GPay",
+  "description": "A highly premium, advanced clone of Google Pay featuring voice AI and 2FA.",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#0a0a0c",
+  "theme_color": "#0a0a0c",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/f/f2/Google_Pay_Logo.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "https://upload.wikimedia.org/wikipedia/commons/f/f2/Google_Pay_Logo.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}

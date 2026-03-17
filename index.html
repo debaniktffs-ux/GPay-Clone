@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#667eea">
+    <title>GPay Clone — Phone Mockup</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Google+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+</head>
+<body>
+    <div class="phone-frame">
+        <div class="phone-screen">
+            <div class="phone-notch"></div>
+            <div class="phone-status-bar">
+                <span class="status-time">4:08</span>
+                <div class="status-icons">
+                    <span class="material-icons-round" style="font-size:16px">signal_cellular_alt</span>
+                    <span class="material-icons-round" style="font-size:16px">wifi</span>
+                    <span class="material-icons-round" style="font-size:16px">battery_full</span>
+                </div>
+            </div>
+
+            <!-- ███ HOME SCREEN ███ -->
+            <div class="home-screen" id="home-screen">
+                <div class="app-grid">
+                    <div class="app-icon-item" onclick="showToast('WhatsApp')">
+                        <div class="app-icon-img" style="background:#25D366;"><span class="material-icons-round">chat</span></div>
+                        <span>WhatsApp</span>
+                    </div>
+                    <div class="app-icon-item" onclick="showToast('Instagram')">
+                        <div class="app-icon-img" style="background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);"><span class="material-icons-round">camera_alt</span></div>
+                        <span>Instagram</span>
+                    </div>
+                    <div class="app-icon-item" onclick="showToast('YouTube')">
+                        <div class="app-icon-img" style="background:#FF0000;"><span class="material-icons-round">play_arrow</span></div>
+                        <span>YouTube</span>
+                    </div>
+                    <div class="app-icon-item" onclick="showToast('Gmail')">
+                        <div class="app-icon-img" style="background:#fff; border:1px solid #ddd;"><span class="material-icons-round" style="color:#EA4335;">email</span></div>
+                        <span>Gmail</span>
+                    </div>
+                    <div class="app-icon-item" onclick="showToast('Maps')">
+                        <div class="app-icon-img" style="background:#fff; border:1px solid #ddd;"><span class="material-icons-round" style="color:#4285F4;">map</span></div>
+                        <span>Maps</span>
+                    </div>
+                    <div class="app-icon-item" onclick="showToast('Twitter / X')">
+                        <div class="app-icon-img" style="background:#000;"><span style="font-size:22px;font-weight:900;color:#fff;">𝕏</span></div>
+                        <span>X</span>
+                    </div>
+                    <div class="app-icon-item" onclick="showToast('Spotify')">
+                        <div class="app-icon-img" style="background:#1DB954;"><span class="material-icons-round">music_note</span></div>
+                        <span>Spotify</span>
+                    </div>
+                    <div class="app-icon-item" onclick="showToast('Photos')">
+                        <div class="app-icon-img" style="background:#fff; border:1px solid #ddd;"><span class="material-icons-round" style="color:#4285F4;">photo_library</span></div>
+                        <span>Photos</span>
+                    </div>
+                    <div class="app-icon-item" onclick="showToast('Amazon')">
+                        <div class="app-icon-img" style="background:#232F3E;"><span class="material-icons-round">shopping_cart</span></div>
+                        <span>Amazon</span>
+                    </div>
+                    <div class="app-icon-item" onclick="showToast('Uber')">
+                        <div class="app-icon-img" style="background:#000;"><span class="material-icons-round">local_taxi</span></div>
+                        <span>Uber</span>
+                    </div>
+                    <div class="app-icon-item" onclick="showToast('Zomato')">
+                        <div class="app-icon-img" style="background:#CB202D;"><span class="material-icons-round">restaurant</span></div>
+                        <span>Zomato</span>
+                    </div>
+                    <!-- ★ GPAY ICON ★ -->
+                    <div class="app-icon-item" onclick="openGPay()">
+                        <div class="app-icon-img" style="background:#fff; border:1px solid #ddd;">
+                            <svg width="28" height="28" viewBox="0 0 48 48"><path fill="#4285F4" d="M23.75 23.37v6.3h8.93c-.37 2.34-2.76 6.85-8.93 6.85-5.37 0-9.75-4.45-9.75-9.93s4.38-9.93 9.75-9.93c3.05 0 5.1 1.3 6.27 2.43l4.27-4.1C31.38 11.3 27.94 9.5 23.75 9.5 15.44 9.5 8.75 16.19 8.75 24.5s6.69 15 15 15c8.65 0 14.4-6.08 14.4-14.63 0-1.13-.12-1.98-.27-2.84H23.75z"/></svg>
+                        </div>
+                        <span>GPay</span>
+                    </div>
+                    <div class="app-icon-item" onclick="showToast('Settings')">
+                        <div class="app-icon-img" style="background:#5f6368;"><span class="material-icons-round">settings</span></div>
+                        <span>Settings</span>
+                    </div>
+                    <div class="app-icon-item" onclick="showToast('Calendar')">
+                        <div class="app-icon-img" style="background:#fff; border:1px solid #ddd;"><span class="material-icons-round" style="color:#4285F4;">calendar_today</span></div>
+                        <span>Calendar</span>
+                    </div>
+                    <div class="app-icon-item" onclick="showToast('Camera')">
+                        <div class="app-icon-img" style="background:#333;"><span class="material-icons-round">photo_camera</span></div>
+                        <span>Camera</span>
+                    </div>
+                    <div class="app-icon-item" onclick="showToast('Files')">
+                        <div class="app-icon-img" style="background:#4285F4;"><span class="material-icons-round">folder</span></div>
+                        <span>Files</span>
+                    </div>
+                </div>
+
+                <!-- Dock -->
+                <div class="phone-dock">
+                    <div class="dock-item" style="background:#25D366;" onclick="showToast('Phone')">
+                        <span class="material-icons-round" style="color:#fff; font-size:28px;">phone</span>
+                    </div>
+                    <div class="dock-item" style="background:#34C759;" onclick="showToast('Messages')">
+                        <span class="material-icons-round" style="color:#fff; font-size:28px;">sms</span>
+                    </div>
+                    <div class="dock-item" style="background:#007AFF;" onclick="showToast('Safari')">
+                        <span class="material-icons-round" style="color:#fff; font-size:28px;">explore</span>
+                    </div>
+                    <div class="dock-item" style="background:#FF3B30;" onclick="showToast('Mail')">
+                        <span class="material-icons-round" style="color:#fff; font-size:28px;">mail</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ███ GPAY APP ███ -->
+            <div class="gpay-app" id="gpay-app">
+                <!-- GPay Header -->
+                <div class="gpay-header">
+                    <div class="gpay-search">
+                        <span class="material-icons-outlined s-icon">search</span>
+                        <input type="text" placeholder="Pay anyone on UPI" readonly onclick="openVoice()">
+                        <span class="material-icons-outlined mic-icon" onclick="openVoice()">mic</span>
+                    </div>
+                    <div class="gpay-profile" onclick="openSpendConfig()">
+                        <img src="https://ui-avatars.com/api/?name=User&background=1a73e8&color=fff" alt="Profile">
+                    </div>
+                </div>
+
+                <!-- GPay Body -->
+                <div class="gpay-body">
+                    <!-- Quick Actions -->
+                    <div class="gpay-actions-grid">
+                        <div class="gpay-action" onclick="showToast('Scan QR')"><div class="gpay-action-icon"><span class="material-icons-outlined">qr_code_scanner</span></div><p>Scan any<br>QR code</p></div>
+                        <div class="gpay-action" onclick="showToast('Pay contacts')"><div class="gpay-action-icon"><span class="material-icons-outlined">contacts</span></div><p>Pay<br>contacts</p></div>
+                        <div class="gpay-action" onclick="showToast('Pay phone')"><div class="gpay-action-icon"><span class="material-icons-outlined">phone_iphone</span></div><p>Pay phone<br>number</p></div>
+                        <div class="gpay-action" onclick="showToast('Bank transfer')"><div class="gpay-action-icon"><span class="material-icons-outlined">account_balance</span></div><p>Bank<br>transfer</p></div>
+                        <div class="gpay-action" onclick="showToast('Pay UPI ID')"><div class="gpay-action-icon"><span class="material-icons-outlined">alternate_email</span></div><p>Pay UPI<br>ID / num</p></div>
+                        <div class="gpay-action" onclick="showToast('Self transfer')"><div class="gpay-action-icon"><span class="material-icons-outlined">person</span></div><p>Self<br>transfer</p></div>
+                        <div class="gpay-action" onclick="showToast('Pay bills')"><div class="gpay-action-icon"><span class="material-icons-outlined">receipt_long</span></div><p>Pay<br>bills</p></div>
+                        <div class="gpay-action" onclick="showToast('Mobile recharge')"><div class="gpay-action-icon"><span class="material-icons-outlined">bolt</span></div><p>Mobile<br>recharge</p></div>
+                    </div>
+
+                    <!-- Spend Limits Banner -->
+                    <div class="spend-limit-banner" id="spend-banner">
+                        <div class="slb-header">
+                            <h3>💰 Monthly Spend</h3>
+                            <button onclick="openSpendConfig()">Edit</button>
+                        </div>
+                        <div class="slb-progress-track">
+                            <div class="slb-progress-fill" id="slb-fill" style="width: 85%;"></div>
+                        </div>
+                        <p class="slb-text" id="slb-text">Spent <strong>₹8,500</strong> of ₹10,000</p>
+                    </div>
+
+                    <!-- People -->
+                    <h2 class="g-section-title">People</h2>
+                    <div class="g-people-grid" id="people-grid">
+                        <!-- Populated by JS -->
+                    </div>
+
+                    <!-- Offers -->
+                    <h2 class="g-section-title">Offers & rewards</h2>
+                    <div class="g-offers-row">
+                        <div class="g-offer-col" onclick="showToast('Rewards')"><div class="g-offer-circle bg-blue"><span class="material-icons-round">emoji_events</span></div><p>Rewards</p></div>
+                        <div class="g-offer-col" onclick="showToast('Offers')"><div class="g-offer-circle bg-red"><span class="material-icons-round">local_offer</span></div><p>Offers</p></div>
+                        <div class="g-offer-col" onclick="showToast('Referrals')"><div class="g-offer-circle bg-yellow"><span class="material-icons-round">group_add</span></div><p>Referrals</p></div>
+                    </div>
+
+                    <!-- List Actions -->
+                    <div style="margin-top: 20px;">
+                        <div class="g-list-btn" onclick="showToast('Check balance')"><span class="material-icons-outlined g-list-icon">account_balance_wallet</span><span class="g-list-text">Check bank balance</span><span class="material-icons-round g-chevron">chevron_right</span></div>
+                        <div class="g-list-btn" onclick="showToast('Transaction history')"><span class="material-icons-outlined g-list-icon">history</span><span class="g-list-text">Transaction history</span><span class="material-icons-round g-chevron">chevron_right</span></div>
+                    </div>
+
+                    <div style="text-align: center; padding: 24px 0;">
+                        <span class="material-icons-round" style="color: #dadce0; font-size: 28px;">security</span>
+                        <p style="font-size: 11px; color: #5f6368; margin-top: 6px;">Your money is safe and secure</p>
+                    </div>
+                </div>
+
+                <!-- GPay Bottom Nav -->
+                <div class="gpay-bottom-nav">
+                    <div class="g-nav-item active"><div class="g-nav-pill"><span class="material-icons-round">home</span></div><span>Home</span></div>
+                    <div class="g-nav-item"><div class="g-nav-pill"><span class="material-icons-outlined">payments</span></div><span>Finance</span></div>
+                    <div class="g-nav-item"><div class="g-nav-pill"><span class="material-icons-outlined">storefront</span></div><span>Offers</span></div>
+                </div>
+            </div>
+
+            <!-- ███ VOICE ASSISTANT (Conversational) ███ -->
+            <div class="voice-overlay" id="voice-overlay">
+                <div style="flex:1;" onclick="closeVoice()"></div>
+                <div class="voice-sheet">
+                    <div class="voice-drag"></div>
+                    <div class="voice-title">
+                        <span class="material-icons-round" style="color:#1a73e8; font-size:24px;">assistant</span>
+                        <h2>GPay Assistant</h2>
+                    </div>
+                    <div class="voice-chat" id="voice-chat">
+                        <!-- Chat bubbles populated by JS -->
+                    </div>
+                    <div class="voice-input-area">
+                        <input type="text" id="voice-text-input" placeholder="Type or tap mic to speak..." onkeydown="if(event.key==='Enter')sendUserMessage()">
+                        <button class="v-mic-btn" id="v-mic-btn" onclick="toggleMic()"><span class="material-icons-round" style="font-size:20px;">mic</span></button>
+                        <button class="v-send-btn" onclick="sendUserMessage()"><span class="material-icons-round" style="font-size:20px;">send</span></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ███ 2FA PIN MODAL ███ -->
+            <div class="twofa-overlay" id="twofa-overlay">
+                <div style="flex:1;" onclick="close2FA()"></div>
+                <div class="twofa-sheet">
+                    <div class="voice-drag"></div>
+                    <h2 class="twofa-title">Secure Payment</h2>
+                    <div class="twofa-details">
+                        <div class="twofa-payee">
+                            <div class="twofa-avatar" id="twofa-avatar">V</div>
+                            <div>
+                                <div class="twofa-payee-name" id="twofa-payee-name">Vinod</div>
+                                <div class="twofa-payee-sub" id="twofa-payee-sub">UPI Transaction</div>
+                            </div>
+                        </div>
+                        <div class="twofa-amount" id="twofa-amount">₹500</div>
+                    </div>
+                    <div class="twofa-pin-section">
+                        <div class="twofa-pin-label">
+                            <span class="material-icons-round" style="font-size:18px;">lock</span>
+                            <span>Enter 4-digit UPI PIN</span>
+                        </div>
+                        <div class="twofa-pin-inputs">
+                            <input type="password" maxlength="1" class="twofa-pin-box" pattern="\d*">
+                            <input type="password" maxlength="1" class="twofa-pin-box" pattern="\d*">
+                            <input type="password" maxlength="1" class="twofa-pin-box" pattern="\d*">
+                            <input type="password" maxlength="1" class="twofa-pin-box" pattern="\d*">
+                        </div>
+                    </div>
+                    <div class="twofa-warning" id="twofa-warning">
+                        <span class="material-icons-round" style="color:#d93025; font-size:22px;">error</span>
+                        <div>
+                            <h4>Spend Limit Exceeded</h4>
+                            <p id="twofa-warning-msg">This payment exceeds your monthly cap!</p>
+                        </div>
+                    </div>
+                    <div class="twofa-actions">
+                        <button class="twofa-btn cancel" onclick="close2FA()">Cancel</button>
+                        <button class="twofa-btn confirm" id="twofa-confirm-btn" onclick="confirm2FA()">Pay ₹500</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ███ SPEND CONFIG MODAL ███ -->
+            <div class="spend-config-overlay" id="spend-config-overlay">
+                <div style="flex:1;" onclick="closeSpendConfig()"></div>
+                <div class="spend-config-sheet">
+                    <div class="voice-drag"></div>
+                    <h2 style="font-size:18px; font-weight:600; margin-bottom:16px;">Spend Limit Settings</h2>
+                    <p style="color:#5f6368; font-size:13px; margin-bottom:16px;">Set a maximum monthly spending amount. You'll be warned when you approach your limit.</p>
+                    
+                    <div class="spend-limit-banner" style="margin:0 0 16px 0;">
+                        <div class="slb-progress-track"><div class="slb-progress-fill" id="sc-fill" style="width:85%;"></div></div>
+                        <p class="slb-text" id="sc-text">Spent <strong>₹8,500</strong> of ₹10,000</p>
+                    </div>
+
+                    <label style="font-size:13px; font-weight:600; color:#202124;">Monthly Cap (₹)</label>
+                    <input type="number" class="sc-input" id="sc-limit-input" value="10000">
+                    <label style="font-size:13px; font-weight:600; color:#202124; margin-top:8px; display:block;">Reset Current Spend (₹)</label>
+                    <input type="number" class="sc-input" id="sc-spend-input" value="8500">
+
+                    <button class="twofa-btn confirm" style="width:100%; margin-top:16px;" onclick="saveSpendConfig()">Save Settings</button>
+                </div>
+            </div>
+
+            <!-- Toast -->
+            <div id="toast" class="gpay-toast">
+                <span class="material-icons-round" style="font-size:18px;">check_circle</span>
+                <span class="toast-text">Done</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+</body>
+</html>

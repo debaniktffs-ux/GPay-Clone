@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Phone Homescreen</title>
+    <link rel="stylesheet" href="os_styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Product+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+</head>
+<body>
+    <div id="phone-container">
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <div class="time">9:41</div>
+            <div class="icons">
+                <span class="material-icons-round">signal_cellular_4_bar</span>
+                <span class="material-icons-round">wifi</span>
+                <span class="material-icons-round">battery_full</span>
+            </div>
+        </div>
+
+        <!-- Homescreen Grid -->
+        <div class="homescreen">
+            <div class="app-row">
+                <div class="app-icon" onclick="launchApp('index.html')">
+                    <div class="icon-bg gpay">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/f/f2/Google_Pay_Logo.svg" alt="GPay">
+                    </div>
+                    <span>GPay</span>
+                </div>
+                <div class="app-icon" onclick="showToast('Camera locked')">
+                    <div class="icon-bg camera">
+                        <span class="material-icons-round">photo_camera</span>
+                    </div>
+                    <span>Camera</span>
+                </div>
+                <div class="app-icon" onclick="showToast('Gallery empty')">
+                    <div class="icon-bg gallery">
+                        <span class="material-icons-round">photo</span>
+                    </div>
+                    <span>Photos</span>
+                </div>
+                <div class="app-icon" onclick="showToast('Settings not available')">
+                    <div class="icon-bg settings">
+                        <span class="material-icons-round">settings</span>
+                    </div>
+                    <span>Settings</span>
+                </div>
+            </div>
+            
+            <div class="app-row">
+                <div class="app-icon" onclick="showToast('No messages')">
+                    <div class="icon-bg messages">
+                        <span class="material-icons-round">message</span>
+                    </div>
+                    <span>Messages</span>
+                </div>
+                <div class="app-icon" onclick="showToast('Browser offline')">
+                    <div class="icon-bg chrome">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/e/e1/Google_Chrome_icon_%28February_2022%29.svg" alt="Chrome">
+                    </div>
+                    <span>Chrome</span>
+                </div>
+                <div class="app-icon" onclick="showToast('Map location off')">
+                    <div class="icon-bg maps">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Google_Maps_icon_%282020%29.svg" alt="Maps">
+                    </div>
+                    <span>Maps</span>
+                </div>
+                <div class="app-icon" onclick="showToast('Calendar empty')">
+                    <div class="icon-bg calendar">
+                        <span class="material-icons-round">calendar_month</span>
+                    </div>
+                    <span>Calendar</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dock -->
+        <div class="dock">
+            <div class="app-icon" onclick="showToast('Phone locked')">
+                <div class="icon-bg phone">
+                    <span class="material-icons-round">call</span>
+                </div>
+            </div>
+            <div class="app-icon" onclick="showToast('Browser offline')">
+                <div class="icon-bg safari">
+                    <span class="material-icons-round">explore</span>
+                </div>
+            </div>
+            <div class="app-icon" onclick="showToast('No mail')">
+                <div class="icon-bg mail">
+                    <span class="material-icons-round">mail</span>
+                </div>
+            </div>
+            <div class="app-icon" onclick="showToast('No music')">
+                <div class="icon-bg music">
+                    <span class="material-icons-round">music_note</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Toast -->
+        <div id="sys-toast" class="toast">Action unavailable</div>
+    </div>
+
+    <!-- App Frame Overlay -->
+    <div id="app-frame" class="hidden">
+        <iframe id="app-iframe" src="about:blank" allow="microphone"></iframe>
+        <div class="home-indicator" onclick="closeApp()"></div>
+    </div>
+
+    <script>
+        function launchApp(url) {
+            const frame = document.getElementById('app-frame');
+            const iframe = document.getElementById('app-iframe');
+            iframe.src = url;
+            frame.classList.remove('hidden');
+            setTimeout(() => {
+                frame.classList.add('visible');
+            }, 10);
+        }
+
+        function closeApp() {
+            const frame = document.getElementById('app-frame');
+            frame.classList.remove('visible');
+            setTimeout(() => {
+                frame.classList.add('hidden');
+                document.getElementById('app-iframe').src = 'about:blank';
+            }, 300); // Wait for transition
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('sys-toast');
+            toast.innerText = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+    </script>
+</body>
+</html>

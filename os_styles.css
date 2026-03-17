@@ -1,0 +1,229 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Product Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    user-select: none;
+}
+
+body {
+    background-color: #0f1014;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+}
+
+#phone-container {
+    width: 100vw;
+    height: 100vh;
+    max-width: 414px;
+    max-height: 896px;
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    position: relative;
+    box-shadow: 0 0 50px rgba(0,0,0,0.5);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* On desktop, add some device framing */
+@media (min-width: 500px) {
+    #phone-container {
+        border-radius: 40px;
+        border: 12px solid #222;
+        outline: 2px solid #555;
+    }
+}
+
+.status-bar {
+    height: 44px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 24px;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    z-index: 10;
+}
+
+.status-bar .icons {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.status-bar .icons span {
+    font-size: 16px;
+}
+
+.homescreen {
+    flex: 1;
+    padding: 30px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.app-row {
+    display: flex;
+    justify-content: space-between;
+}
+
+.app-icon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    width: 65px;
+    cursor: pointer;
+    transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.app-icon:active {
+    transform: scale(0.9);
+}
+
+.icon-bg {
+    width: 60px;
+    height: 60px;
+    border-radius: 14px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    background-color: white;
+    overflow: hidden;
+}
+
+.icon-bg img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Specific icon gradients */
+.gpay { background: white; padding: 12px; }
+.gpay img { object-fit: contain; }
+.camera { background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%); color: #333; }
+.gallery { background: conic-gradient(from 180deg at 50% 50%, #FFD700 -43.19deg, #32CD32 46.16deg, #4169E1 134.42deg, #FF4500 232.06deg, #FFD700 316.81deg); }
+.settings { background: linear-gradient(135deg, #d4d3dd 0%, #efefbb 100%); color: #333; }
+.messages { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; }
+.chrome { background: white; padding: 10px; }
+.maps { background: white; padding: 10px; }
+.calendar { background: white; color: #ea4335; font-size: 32px; }
+
+.app-icon span {
+    color: white;
+    font-size: 12px;
+    font-weight: 500;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+    text-align: center;
+}
+
+.dock {
+    height: 96px;
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    margin: 0 16px 20px 16px;
+    border-radius: 30px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 0 10px;
+}
+
+.dock .app-icon {
+    width: auto;
+}
+
+.dock .app-icon span {
+    display: none;
+}
+
+.dock .icon-bg {
+    background-color: red;
+}
+
+.phone { background: linear-gradient(135deg, #00b09b, #96c93d); color: white; }
+.safari { background: white; color: #007aff; }
+.mail { background: linear-gradient(135deg, #6dd5ed, #2193b0); color: white; }
+.music { background: linear-gradient(135deg, #f857a6, #ff5858); color: white; }
+
+.icon-bg span {
+    font-size: 32px;
+}
+
+/* System Toast */
+.toast {
+    position: absolute;
+    bottom: 140px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: rgba(30, 30, 30, 0.9);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    opacity: 0;
+    transition: all 0.3s ease;
+    pointer-events: none;
+    z-index: 100;
+    font-size: 14px;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* App Frame Interface Overlay */
+#app-frame {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: black;
+    z-index: 999;
+    transform: translateY(100%) scale(0.9);
+    opacity: 0;
+    transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s ease;
+    border-radius: inherit;
+    overflow: hidden;
+}
+
+#app-frame.visible {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+}
+
+#app-iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    background: #fff;
+}
+
+/* Home bar indicator to close app */
+.home-indicator {
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 130px;
+    height: 5px;
+    background: rgba(255,255,255,0.8);
+    border-radius: 100px;
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    z-index: 1000;
+}
+
+.home-indicator:hover {
+    background: white;
+    height: 6px;
+}
