@@ -1,31 +1,4 @@
-// gpay_clone_web/app.js — Phone Mockup Edition
 
-// ═══════════════════════════════════════════
-// PHONE HOME SCREEN → GPAY NAVIGATION
-// ═══════════════════════════════════════════
-function openGPay() {
-    console.log('openGPay called');
-    const home = document.getElementById('home-screen');
-    const app = document.getElementById('gpay-app');
-    
-    if (home && app) {
-        home.classList.add('hidden');
-        app.classList.add('active');
-        console.log('Classes adjusted: home hidden, app active');
-    } else {
-        console.error('Core elements not found', { home, app });
-    }
-}
-
-function closeGPay() {
-    const home = document.getElementById('home-screen');
-    const app = document.getElementById('gpay-app');
-    
-    if (app) app.classList.remove('active');
-    setTimeout(() => {
-        if (home) home.classList.remove('hidden');
-    }, 100);
-}
 
 // ═══════════════════════════════════════════
 // DATA
@@ -325,15 +298,41 @@ function applyState(state) {
 // ═══════════════════════════════════════════
 // INITIALIZATION
 // ═══════════════════════════════════════════
-document.addEventListener('DOMContentLoaded', async () => {
-    await loadState();
-    
-    // Apply layout state
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. Initial immediate setup (don't wait for database)
+    populatePeople();
+    updateSpendBanner();
+    setupPinAutoFocus();
+
+    // 2. Load from database (async in background)
+    loadState().then(() => {
+        console.log('Background state sync complete.');
+        // Re-apply if elderlyMode changed
+        if (elderlyMode) {
+            document.getElementById('elderly-toggle').checked = true;
+            toggleElderlyModeUI(true);
+        }
+        if (currentSpend > monthlyLimit) {
+            const exceededBy = currentSpend - monthlyLimit;
+            setTimeout(() => {
+                alert(`⚠️ Notice: You have exceeded your monthly spend limit of ₹${monthlyLimit.toLocaleString()} by ₹${exceededBy.toLocaleString()}!`);
+            }, 800);
+        }
+    });
+
+    // 3. One-off layout check for immediate cached state (if any)
     if (elderlyMode) {
-        document.getElementById('elderly-toggle').checked = true;
-        const regularBody = document.getElementById('regular-body');
-        const elderlyBody = document.getElementById('elderly-body');
-        const title = document.getElementById('mode-title');
+        toggleElderlyModeUI(true);
+    }
+});
+
+function toggleElderlyModeUI(active) {
+    const regularBody = document.getElementById('regular-body');
+    const elderlyBody = document.getElementById('elderly-body');
+    const title = document.getElementById('mode-title');
+    if (!regularBody || !elderlyBody || !title) return;
+
+    if (active) {
         title.innerText = '🛡️ Guardian Pay';
         title.classList.add('guardian');
         regularBody.style.display = 'none';
@@ -341,19 +340,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         updateElderlySpend();
         renderElderlyTransactions();
         renderElderlyReviewers();
+    } else {
+        title.innerText = 'GPay';
+        title.classList.remove('guardian');
+        regularBody.style.display = 'block';
+        elderlyBody.style.display = 'none';
     }
-
-    populatePeople();
-    updateSpendBanner();
-    setupPinAutoFocus();
-
-    if (currentSpend > monthlyLimit) {
-        const exceededBy = currentSpend - monthlyLimit;
-        setTimeout(() => {
-            alert(`⚠️ Notice: You have exceeded your monthly spend limit of ₹${monthlyLimit.toLocaleString()} by ₹${exceededBy.toLocaleString()}!`);
-        }, 800);
-    }
-});
+}
 
 function populatePeople() {
     const grid = document.getElementById('people-grid');
