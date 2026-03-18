@@ -17,8 +17,9 @@ const people = [
 // ═══════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════
-let currentSpend = 8500;
-let monthlyLimit = 10000;
+let currentSpend = 0;
+let monthlyLimit = 20000;
+let bankBalance = 100000;
 let pendingPayee = '';
 let pendingAmount = 0;
 
@@ -58,6 +59,81 @@ if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
 // Voice State
 let isVoiceMuted = false;
 let currentVoiceLang = 'en-IN';
+
+const translations = {
+    'hi-IN': {
+        "👋 Hi! I'm your GPay Assistant. I'm here to help you make a payment step by step.": "नमस्ते! मैं आपका जी-पे असिस्टेंट हूँ। मैं आपको भुगतान करने में मदद करूँगा।",
+        "Who would you like to send money to?": "आप किसे पैसे भेजना चाहेंगे?",
+        "How much would you like to send? You can type an amount or choose below:": "आप कितने पैसे भेजना चाहेंगे? आप नीचे दिए विकल्पों में से चुन सकते हैं:",
+        "Which bank account would you like to pay from?": "आप किस बैंक खाते से भुगतान करना चाहेंगे?",
+        "How would you like to proceed?": "आप कैसे आगे बढ़ना चाहेंगे?",
+        "🔐 Opening secure payment verification...": "🔐 सुरक्षित भुगतान सत्यापन खोला जा रहा है...",
+        "No problem! Payment cancelled. Is there anything else I can help with?": "कोई बात नहीं! भुगतान रद्द कर दिया गया है। क्या मैं आपकी और कोई मदद कर सकता हूँ?",
+        "You can start a new payment or close this assistant.": "आप नया भुगतान शुरू कर सकते हैं या इसे बंद कर सकते हैं।",
+        "Sure! Who would you like to pay this time?": "ज़रूर! इस बार आप किसे पैसे भेजना चाहेंगे?",
+        "I didn't catch the amount. Please enter a number or choose below:": "मुझे राशि समझ नहीं आई। कृपया कोई संख्या दर्ज करें या नीचे चुनें:",
+        "Please choose a bank account from the options below:": "कृपया नीचे दिए गए विकल्पों में से एक बैंक खाता चुनें:",
+        "Would you like to make a payment? Let me help you get started.": "क्या आप भुगतान करना चाहेंगे? चलिए मैं आपकी मदद करता हूँ।",
+        "🛡️ Great choice! I'll open the reviewer setup so you can add a trusted person to verify this transaction.": "🛡️ बहुत बढ़िया! मैं समीक्षक सेटअप खोल रहा हूँ ताकि आप लेनदेन सत्यापित करने के लिए एक विश्वसनीय व्यक्ति जोड़ सकें।"
+    },
+    'bn-IN': {
+        "👋 Hi! I'm your GPay Assistant. I'm here to help you make a payment step by step.": "নমস্কার! আমি আপনার জি-পে অ্যাসিস্ট্যান্ট। আমি আপনাকে পেমেন্ট করতে সাহায্য করব।",
+        "Who would you like to send money to?": "আপনি কাকে টাকা পাঠাতে চান?",
+        "How much would you like to send? You can type an amount or choose below:": "আপনি কত টাকা পাঠাতে চান? আপনি নিচে থেকে বেছে নিতে পারেন:",
+        "Which bank account would you like to pay from?": "আপনি কোন ব্যাঙ্ক অ্যাকাউন্ট থেকে পেমেন্ট করতে চান?",
+        "How would you like to proceed?": "আপনি কীভাবে এগিয়ে যেতে চান?",
+        "🔐 Opening secure payment verification...": "🔐 সুরক্ষিত পেমেন্ট ভেরিফিকেশন খোলা হচ্ছে...",
+        "No problem! Payment cancelled. Is there anything else I can help with?": "কোনো সমস্যা নেই! পেমেন্ট বাতিল করা হয়েছে। আমি কি আর কোনোভাবে সাহায্য করতে পারি?",
+        "You can start a new payment or close this assistant.": "আপনি একটি নতুন পেমেন্ট শুরু করতে পারেন বা এটি বন্ধ করতে পারেন।",
+        "Sure! Who would you like to pay this time?": "নিশ্চয়ই! এবার আপনি কাকে টাকা পাঠাতে চান?",
+        "I didn't catch the amount. Please enter a number or choose below:": "আমি পরিমাণটা বুঝতে পারিনি। অনুগ্রহ করে একটি সংখ্যা লিখুন বা নিচে থেকে বেছে নিন:",
+        "Please choose a bank account from the options below:": "অনুগ্রহ করে নিচের বিকল্পগুলি থেকে একটি ব্যাঙ্ক অ্যাকাউন্ট বেছে নিন:",
+        "Would you like to make a payment? Let me help you get started.": "আপনি কি পেমেন্ট করতে চান? চলুন আমি আপনাকে সাহায্য করি।",
+        "🛡️ Great choice! I'll open the reviewer setup so you can add a trusted person to verify this transaction.": "🛡️ দুর্দান্ত পছন্দ! আমি রিভিউয়ার সেটআপ খুলছি যাতে আপনি লেনদেন ভেরিফাই করার জন্য একজন বিশ্বস্ত ব্যক্তিকে যোগ করতে পারেন।"
+    }
+};
+
+function t(text) {
+    if (translations[currentVoiceLang] && translations[currentVoiceLang][text]) {
+        return translations[currentVoiceLang][text];
+    }
+    return text; // fallback to English
+}
+
+function tDynamic(type, val1, val2) {
+    if (currentVoiceLang === 'hi-IN') {
+        if (type === 'payee') return `बढ़िया! आप <strong>${val1}</strong> को भुगतान करना चाहते हैं। 👍`;
+        if (type === 'amount') return `₹${val1.toLocaleString()} — समझ गया! 👍`;
+        if (type === 'not_found') return `मुझे आपके संपर्कों में "${val1}" नहीं मिला। कृपया नीचे दी गई सूची से चुनें:`;
+        if (type === 'confirm') {
+            let confirmMsg = `मैं पुष्टि करता हूँ:<br><br>📤 <strong>${val1} को भुगतान</strong><br>💰 <strong>₹${val2.amount.toLocaleString()}</strong><br>🏦 <strong>यहां से: ${val2.bank}</strong>`;
+            if (val2.willExceed) confirmMsg += `<br><br>⚠️ <em>चेतावनी: यह आपकी मासिक सीमा ₹${val2.limit.toLocaleString()} को पार कर जाएगा</em>`;
+            if (val2.requiresReview) confirmMsg += `<br><br>🛡️ <em>ध्यान दें: ₹2,000 से अधिक राशि के लिए विश्वसनीय संपर्क से समीक्षा आवश्यक है।</em>`;
+            return confirmMsg;
+        }
+    }
+    if (currentVoiceLang === 'bn-IN') {
+        if (type === 'payee') return `দারুণ! আপনি <strong>${val1}</strong> কে পেমেন্ট করতে চান। 👍`;
+        if (type === 'amount') return `₹${val1.toLocaleString()} — বুঝতে পেরেছি! 👍`;
+        if (type === 'not_found') return `আমি আপনার পরিচিতিতে "${val1}" খুঁজে পাইনি। অনুগ্রহ করে নিচের তালিকা থেকে বেছে নিন:`;
+        if (type === 'confirm') {
+            let confirmMsg = `আমি নিশ্চিত করছি:<br><br>📤 <strong>${val1} কে পেমেন্ট</strong><br>💰 <strong>₹${val2.amount.toLocaleString()}</strong><br>🏦 <strong>এখান থেকে: ${val2.bank}</strong>`;
+            if (val2.willExceed) confirmMsg += `<br><br>⚠️ <em>সতর্কতা: এটি আপনার মাসিক সীমা ₹${val2.limit.toLocaleString()} অতিক্রম করবে</em>`;
+            if (val2.requiresReview) confirmMsg += `<br><br>🛡️ <em>বিজ্ঞপ্তি: ₹2,000 এর বেশি পরিমাণের জন্য একজন বিশ্বস্ত ব্যক্তির দ্বারা পর্যালোচনা প্রয়োজন।</em>`;
+            return confirmMsg;
+        }
+    }
+    // English
+    if (type === 'payee') return `Great! You want to pay <strong>${val1}</strong>. 👍`;
+    if (type === 'amount') return `₹${val1.toLocaleString()} — got it! 👍`;
+    if (type === 'not_found') return `I couldn't find "${val1}" in your contacts. Please choose from the list below:`;
+    if (type === 'confirm') {
+        let confirmMsg = `Let me confirm:<br><br>📤 <strong>Pay ${val1}</strong><br>💰 <strong>₹${val2.amount.toLocaleString()}</strong><br>🏦 <strong>From: ${val2.bank}</strong>`;
+        if (val2.willExceed) confirmMsg += `<br><br>⚠️ <em>Warning: This will exceed your monthly limit of ₹${val2.limit.toLocaleString()}</em>`;
+        if (val2.requiresReview) confirmMsg += `<br><br>🛡️ <em>Notice: Amounts over ₹2,000 require review by a trusted contact.</em>`;
+        return confirmMsg;
+    }
+}
 
 function speakText(text) {
     if (!('speechSynthesis' in window) || isVoiceMuted) return;
@@ -117,6 +193,7 @@ function toggleVoiceMute() {
 function saveState() {
     const state = {
         currentSpend,
+        bankBalance,
         transactionHistory,
         savedReviewers
     };
@@ -129,6 +206,7 @@ function loadState() {
         try {
             const state = JSON.parse(saved);
             if (state.currentSpend !== undefined) currentSpend = state.currentSpend;
+            if (state.bankBalance !== undefined) bankBalance = state.bankBalance;
             if (state.transactionHistory) transactionHistory = state.transactionHistory;
             if (state.savedReviewers) savedReviewers = state.savedReviewers;
         } catch (e) {
@@ -145,6 +223,13 @@ document.addEventListener('DOMContentLoaded', () => {
     populatePeople();
     updateSpendBanner();
     setupPinAutoFocus();
+
+    if (currentSpend > monthlyLimit) {
+        const exceededBy = currentSpend - monthlyLimit;
+        setTimeout(() => {
+            alert(`⚠️ Notice: You have exceeded your monthly spend limit of ₹${monthlyLimit.toLocaleString()} by ₹${exceededBy.toLocaleString()}!`);
+        }, 800);
+    }
 });
 
 function populatePeople() {
@@ -406,14 +491,21 @@ function confirm2FA() {
         return;
     }
 
-    // Check spend limit
-    if (currentSpend + pendingAmount > monthlyLimit) {
-        showToast('⚠️ Payment blocked — limit exceeded!');
+    // Check bank balance
+    if (bankBalance - pendingAmount < 0) {
+        showToast('⚠️ Payment blocked — insufficient bank balance!');
         return;
+    }
+
+    // Check spend limit but allow it
+    if (currentSpend + pendingAmount > monthlyLimit) {
+        const excess = (currentSpend + pendingAmount) - monthlyLimit;
+        showToast(`⚠️ Spend limit exceeded by ₹${excess.toLocaleString()}!`);
     }
 
     close2FA();
     currentSpend += pendingAmount;
+    bankBalance -= pendingAmount;
     updateSpendBanner();
     updateElderlySpend();
     addTransaction(pendingPayee, pendingAmount, 'Paid ✓');
@@ -438,9 +530,9 @@ function openVoice() {
 
     // Begin conversation
     setTimeout(() => {
-        addBubble('assistant', '👋 Hi! I\'m your GPay Assistant. I\'m here to help you make a payment step by step.');
+        addBubble('assistant', t("👋 Hi! I'm your GPay Assistant. I'm here to help you make a payment step by step."));
         setTimeout(() => {
-            addBubble('assistant', 'Who would you like to send money to?');
+            addBubble('assistant', t('Who would you like to send money to?'));
             showPeopleOptions();
             voiceStep = 'ask_who';
         }, 800);
@@ -503,9 +595,9 @@ function selectPayee(name) {
     voiceStep = 'ask_amount';
 
     setTimeout(() => {
-        addBubble('assistant', `Great! You want to pay <strong>${name}</strong>. 👍`);
+        addBubble('assistant', tDynamic('payee', name));
         setTimeout(() => {
-            addBubble('assistant', 'How much would you like to send? You can type an amount or choose below:');
+            addBubble('assistant', t('How much would you like to send? You can type an amount or choose below:'));
             showAmountOptions();
         }, 600);
     }, 300);
@@ -517,9 +609,9 @@ function selectAmount(amount) {
     voiceStep = 'ask_bank';
 
     setTimeout(() => {
-        addBubble('assistant', `₹${amount.toLocaleString()} — got it! 👍`);
+        addBubble('assistant', tDynamic('amount', amount));
         setTimeout(() => {
-            addBubble('assistant', 'Which bank account would you like to pay from?');
+            addBubble('assistant', t('Which bank account would you like to pay from?'));
             showBankOptions();
         }, 600);
     }, 300);
@@ -549,19 +641,18 @@ function selectBank(bank) {
         const willExceed = currentSpend + voiceSelectedAmount > monthlyLimit;
         const requiresReview = voiceSelectedAmount > 2000;
         
-        let confirmMsg = `Let me confirm:<br><br>📤 <strong>Pay ${voiceSelectedPayee}</strong><br>💰 <strong>₹${voiceSelectedAmount.toLocaleString()}</strong><br>🏦 <strong>From: ${voiceSelectedBank}</strong>`;
-
-        if (willExceed) {
-            confirmMsg += `<br><br>⚠️ <em>Warning: This will exceed your monthly limit of ₹${monthlyLimit.toLocaleString()}</em>`;
-        }
-        if (requiresReview) {
-            confirmMsg += `<br><br>🛡️ <em>Notice: Amounts over ₹2,000 require review by a trusted contact.</em>`;
-        }
+        let confirmMsg = tDynamic('confirm', voiceSelectedPayee, {
+            amount: voiceSelectedAmount,
+            bank: voiceSelectedBank,
+            willExceed: willExceed,
+            limit: monthlyLimit,
+            requiresReview: requiresReview
+        });
 
         addBubble('assistant', confirmMsg);
 
         setTimeout(() => {
-            addBubble('assistant', 'How would you like to proceed?');
+            addBubble('assistant', t('How would you like to proceed?'));
             const chat = document.getElementById('voice-chat');
             const optionsDiv = document.createElement('div');
             optionsDiv.className = 'v-bubble options';
@@ -603,7 +694,7 @@ function confirmVoicePayment() {
     voiceStep = 'idle';
 
     setTimeout(() => {
-        addBubble('assistant', '🔐 Opening secure payment verification...');
+        addBubble('assistant', t('🔐 Opening secure payment verification...'));
         setTimeout(() => {
             closeVoice();
             open2FA(voiceSelectedPayee, voiceSelectedAmount);
@@ -616,9 +707,9 @@ function cancelVoicePayment() {
     voiceStep = 'idle';
 
     setTimeout(() => {
-        addBubble('assistant', 'No problem! Payment cancelled. Is there anything else I can help with?');
+        addBubble('assistant', t('No problem! Payment cancelled. Is there anything else I can help with?'));
         setTimeout(() => {
-            addBubble('assistant', 'You can start a new payment or close this assistant.');
+            addBubble('assistant', t('You can start a new payment or close this assistant.'));
             const chat = document.getElementById('voice-chat');
             const optionsDiv = document.createElement('div');
             optionsDiv.className = 'v-bubble options';
@@ -648,7 +739,7 @@ function restartVoice() {
     voiceSelectedAmount = 0;
 
     setTimeout(() => {
-        addBubble('assistant', 'Sure! Who would you like to pay this time?');
+        addBubble('assistant', t('Sure! Who would you like to pay this time?'));
         showPeopleOptions();
     }, 300);
 }
@@ -670,7 +761,7 @@ function sendUserMessage() {
             selectPayee(matched.name);
         } else {
             setTimeout(() => {
-                addBubble('assistant', `I couldn't find "${text}" in your contacts. Please choose from the list below:`);
+                addBubble('assistant', tDynamic('not_found', text));
                 showPeopleOptions();
             }, 300);
         }
@@ -680,7 +771,7 @@ function sendUserMessage() {
             selectAmount(parseInt(numMatch[0], 10));
         } else {
             setTimeout(() => {
-                addBubble('assistant', 'I didn\'t catch the amount. Please enter a number or choose below:');
+                addBubble('assistant', t('I didn\'t catch the amount. Please enter a number or choose below:'));
                 showAmountOptions();
             }, 300);
         }
@@ -690,15 +781,15 @@ function sendUserMessage() {
             selectBank(matched);
         } else {
             setTimeout(() => {
-                addBubble('assistant', 'Please choose a bank account from the options below:');
+                addBubble('assistant', t('Please choose a bank account from the options below:'));
                 showBankOptions();
             }, 300);
         }
     } else {
         setTimeout(() => {
-            addBubble('assistant', 'Would you like to make a payment? Let me help you get started.');
+            addBubble('assistant', t('Would you like to make a payment? Let me help you get started.'));
             setTimeout(() => {
-                addBubble('assistant', 'Who would you like to send money to?');
+                addBubble('assistant', t('Who would you like to send money to?'));
                 showPeopleOptions();
                 voiceStep = 'ask_who';
             }, 500);
@@ -759,7 +850,7 @@ function openReviewerFromVoice() {
     voiceStep = 'idle';
 
     setTimeout(() => {
-        addBubble('assistant', '🛡️ Great choice! I\'ll open the reviewer setup so you can add a trusted person to verify this transaction.');
+        addBubble('assistant', t('🛡️ Great choice! I\'ll open the reviewer setup so you can add a trusted person to verify this transaction.'));
         setTimeout(() => {
             closeVoice();
             openReviewerSetup();

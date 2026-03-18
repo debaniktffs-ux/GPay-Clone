@@ -162,9 +162,9 @@
                             <button onclick="openSpendConfig()">Edit</button>
                         </div>
                         <div class="slb-progress-track">
-                            <div class="slb-progress-fill" id="slb-fill" style="width: 85%;"></div>
+                            <div class="slb-progress-fill" id="slb-fill" style="width: 0%;"></div>
                         </div>
-                        <p class="slb-text" id="slb-text">Spent <strong>₹8,500</strong> of ₹10,000</p>
+                        <p class="slb-text" id="slb-text">Spent <strong>₹0</strong> of ₹20,000</p>
                     </div>
 
                     <!-- People -->
@@ -236,11 +236,11 @@
                     <!-- Spend Limits (Large) -->
                     <div class="elder-spend-card">
                         <h3>💰 Monthly Spending</h3>
-                        <div class="elder-spend-amount" id="elder-spend-amount">₹8,500 <span>/ ₹10,000</span></div>
+                        <div class="elder-spend-amount" id="elder-spend-amount">₹0 <span>/ ₹20,000</span></div>
                         <div class="slb-progress-track" style="height:12px;">
-                            <div class="slb-progress-fill" id="elder-slb-fill" style="width:85%;"></div>
+                            <div class="slb-progress-fill" id="elder-slb-fill" style="width:0%;"></div>
                         </div>
-                        <div class="elder-spend-remaining" id="elder-spend-remaining">₹1,500 remaining</div>
+                        <div class="elder-spend-remaining" id="elder-spend-remaining">₹20,000 remaining</div>
                         <button class="elder-edit-limit" onclick="openSpendConfig()">
                             <span class="material-icons-round" style="font-size:16px;">edit</span> Edit Limit
                         </button>
@@ -378,14 +378,14 @@
                     <p style="color:#5f6368; font-size:13px; margin-bottom:16px;">Set a maximum monthly spending amount. You'll be warned when you approach your limit.</p>
                     
                     <div class="spend-limit-banner" style="margin:0 0 16px 0;">
-                        <div class="slb-progress-track"><div class="slb-progress-fill" id="sc-fill" style="width:85%;"></div></div>
-                        <p class="slb-text" id="sc-text">Spent <strong>₹8,500</strong> of ₹10,000</p>
+                        <div class="slb-progress-track"><div class="slb-progress-fill" id="sc-fill" style="width:0%;"></div></div>
+                        <p class="slb-text" id="sc-text">Spent <strong>₹0</strong> of ₹20,000</p>
                     </div>
 
                     <label style="font-size:13px; font-weight:600; color:#202124;">Monthly Cap (₹)</label>
-                    <input type="number" class="sc-input" id="sc-limit-input" value="10000">
+                    <input type="number" class="sc-input" id="sc-limit-input" value="20000">
                     <label style="font-size:13px; font-weight:600; color:#202124; margin-top:8px; display:block;">Reset Current Spend (₹)</label>
-                    <input type="number" class="sc-input" id="sc-spend-input" value="8500">
+                    <input type="number" class="sc-input" id="sc-spend-input" value="0">
 
                     <button class="twofa-btn confirm" style="width:100%; margin-top:16px;" onclick="saveSpendConfig()">Save Settings</button>
                 </div>
