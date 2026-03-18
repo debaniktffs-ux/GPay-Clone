@@ -18,11 +18,11 @@ const people = [
 const SUPABASE_URL = 'https://rpmwmattppvgfbteidct.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_eyYpykciRHmcIbL9kFUmCw_dixh5pWw';
 
-let supabase = null;
+let supabaseClient = null;
 try {
     const isSupabaseConfigured = SUPABASE_URL && !SUPABASE_URL.includes('YOUR_');
     if (isSupabaseConfigured && typeof window.supabase !== 'undefined') {
-        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         console.log('Supabase client initialized ✓');
     }
 } catch (e) {
@@ -239,9 +239,9 @@ async function saveState() {
     localStorage.setItem('gpayCloneState', JSON.stringify(state));
 
     // Save to Supabase if configured
-    if (supabase) {
+    if (supabaseClient) {
         try {
-            const { error } = await supabase
+            const { error } = await supabaseClient
                 .from('app_state')
                 .upsert({ id: USER_ID, data: state }, { onConflict: 'id' });
             
@@ -254,9 +254,9 @@ async function saveState() {
 
 async function loadState() {
     // 1. Try to load from Supabase first
-    if (supabase) {
+    if (supabaseClient) {
         try {
-            const { data, error } = await supabase
+            const { data, error } = await supabaseClient
                 .from('app_state')
                 .select('data')
                 .eq('id', USER_ID)
