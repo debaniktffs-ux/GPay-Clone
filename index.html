@@ -183,8 +183,8 @@
 
                     <!-- List Actions -->
                     <div style="margin-top: 20px;">
-                        <div class="g-list-btn" onclick="showToast('Check balance')"><span class="material-icons-outlined g-list-icon">account_balance_wallet</span><span class="g-list-text">Check bank balance</span><span class="material-icons-round g-chevron">chevron_right</span></div>
-                        <div class="g-list-btn" onclick="showToast('Transaction history')"><span class="material-icons-outlined g-list-icon">history</span><span class="g-list-text">Transaction history</span><span class="material-icons-round g-chevron">chevron_right</span></div>
+                        <div class="g-list-btn" onclick="openCheckBalance()"><span class="material-icons-outlined g-list-icon">account_balance_wallet</span><span class="g-list-text">Check bank balance</span><span class="material-icons-round g-chevron">chevron_right</span></div>
+                        <div class="g-list-btn" onclick="openTransactionHistory()"><span class="material-icons-outlined g-list-icon">history</span><span class="g-list-text">Transaction history</span><span class="material-icons-round g-chevron">chevron_right</span></div>
                     </div>
 
                     <div style="text-align: center; padding: 24px 0;">
@@ -366,6 +366,39 @@
                         <button class="twofa-btn cancel" onclick="close2FA()">Cancel</button>
                         <button class="twofa-btn confirm" id="twofa-confirm-btn" onclick="confirm2FA()">Pay ₹500</button>
                     </div>
+                </div>
+            </div>
+
+            <!-- ███ HISTORY MODAL ███ -->
+            <div class="history-overlay" id="history-overlay">
+                <div style="flex:1;" onclick="closeHistory()"></div>
+                <div class="history-sheet">
+                    <div class="voice-drag"></div>
+                    <div class="elder-section-header" style="margin-bottom:16px;">
+                        <span class="material-icons-round" style="color:var(--google-blue);">receipt_long</span>
+                        <h3 style="font-size:16px; font-weight:600;">Transaction History</h3>
+                    </div>
+                    <div class="elder-txn-list" id="normal-txn-list">
+                        <div class="elder-txn-empty">
+                            <span class="material-icons-round" style="font-size:36px; color:#dadce0;">history</span>
+                            <p>No transactions yet.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ███ BALANCE MODAL ███ -->
+            <div class="balance-overlay" id="balance-overlay">
+                <div style="flex:1;" onclick="closeBalance()"></div>
+                <div class="balance-sheet">
+                    <div class="voice-drag"></div>
+                    <div style="text-align:center; padding: 20px 0;">
+                        <img src="https://ui-avatars.com/api/?name=Bank&background=1e8e3e&color=fff" style="border-radius:50%; width:60px; margin-bottom:12px;">
+                        <h2 style="font-size:20px; font-weight:600; color:var(--text-primary); margin-bottom:8px;">Bank Balance</h2>
+                        <h1 style="font-size:32px; font-weight:700; color:var(--google-green);" id="balance-display">—</h1>
+                        <p style="color:var(--text-secondary); font-size:14px; margin-top:8px;">Available balance in default account</p>
+                    </div>
+                    <button class="twofa-btn confirm" style="width:100%; margin-top:16px; background:#f1f3f4; color:#202124;" onclick="closeBalance()">Done</button>
                 </div>
             </div>
 

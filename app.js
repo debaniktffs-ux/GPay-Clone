@@ -22,6 +22,7 @@ let monthlyLimit = 20000;
 let bankBalance = 100000;
 let pendingPayee = '';
 let pendingAmount = 0;
+let pinMode = 'payment'; // 'payment' or 'balance'
 
 // Voice Assistant Conversation State
 let voiceStep = 'idle'; // idle, ask_who, ask_amount, ask_bank, confirm_all
@@ -74,7 +75,11 @@ const translations = {
         "I didn't catch the amount. Please enter a number or choose below:": "मुझे राशि समझ नहीं आई। कृपया कोई संख्या दर्ज करें या नीचे चुनें:",
         "Please choose a bank account from the options below:": "कृपया नीचे दिए गए विकल्पों में से एक बैंक खाता चुनें:",
         "Would you like to make a payment? Let me help you get started.": "क्या आप भुगतान करना चाहेंगे? चलिए मैं आपकी मदद करता हूँ।",
-        "🛡️ Great choice! I'll open the reviewer setup so you can add a trusted person to verify this transaction.": "🛡️ बहुत बढ़िया! मैं समीक्षक सेटअप खोल रहा हूँ ताकि आप लेनदेन सत्यापित करने के लिए एक विश्वसनीय व्यक्ति जोड़ सकें।"
+        "🛡️ Great choice! I'll open the reviewer setup so you can add a trusted person to verify this transaction.": "🛡️ बहुत बढ़िया! मैं समीक्षक सेटअप खोल रहा हूँ ताकि आप लेनदेन सत्यापित करने के लिए एक विश्वसनीय व्यक्ति जोड़ सकें।",
+        "What would you like to do?": "आप क्या करना चाहेंगे?",
+        "💸 Make a Payment": "💸 भुगतान करें",
+        "🏦 Check Bank Balance": "🏦 बैंक बैलेंस जांचें",
+        "Okay, please enter your PIN to view your balance.": "ठीक है, अपना बैलेंस देखने के लिए अपना पिन दर्ज करें।"
     },
     'bn-IN': {
         "👋 Hi! I'm your GPay Assistant. I'm here to help you make a payment step by step.": "নমস্কার! আমি আপনার জি-পে অ্যাসিস্ট্যান্ট। আমি আপনাকে পেমেন্ট করতে সাহায্য করব।",
@@ -89,7 +94,11 @@ const translations = {
         "I didn't catch the amount. Please enter a number or choose below:": "আমি পরিমাণটা বুঝতে পারিনি। অনুগ্রহ করে একটি সংখ্যা লিখুন বা নিচে থেকে বেছে নিন:",
         "Please choose a bank account from the options below:": "অনুগ্রহ করে নিচের বিকল্পগুলি থেকে একটি ব্যাঙ্ক অ্যাকাউন্ট বেছে নিন:",
         "Would you like to make a payment? Let me help you get started.": "আপনি কি পেমেন্ট করতে চান? চলুন আমি আপনাকে সাহায্য করি।",
-        "🛡️ Great choice! I'll open the reviewer setup so you can add a trusted person to verify this transaction.": "🛡️ দুর্দান্ত পছন্দ! আমি রিভিউয়ার সেটআপ খুলছি যাতে আপনি লেনদেন ভেরিফাই করার জন্য একজন বিশ্বস্ত ব্যক্তিকে যোগ করতে পারেন।"
+        "🛡️ Great choice! I'll open the reviewer setup so you can add a trusted person to verify this transaction.": "🛡️ দুর্দান্ত পছন্দ! আমি রিভিউয়ার সেটআপ খুলছি যাতে আপনি লেনদেন ভেরিফাই করার জন্য একজন বিশ্বস্ত ব্যক্তিকে যোগ করতে পারেন।",
+        "What would you like to do?": "আপনি কী করতে চান?",
+        "💸 Make a Payment": "💸 পেমেন্ট করুন",
+        "🏦 Check Bank Balance": "🏦 ব্যাঙ্ক ব্যালেন্স দেখুন",
+        "Okay, please enter your PIN to view your balance.": "ঠিক আছে, আপনার ব্যালেন্স দেখতে আপনার পিন প্রবেশ করান।"
     }
 };
 
@@ -111,6 +120,7 @@ function tDynamic(type, val1, val2) {
             if (val2.requiresReview) confirmMsg += `<br><br>🛡️ <em>ध्यान दें: ₹2,000 से अधिक राशि के लिए विश्वसनीय संपर्क से समीक्षा आवश्यक है।</em>`;
             return confirmMsg;
         }
+        if (type === 'balance_result') return `आपका बैंक बैलेंस ₹${val1.toLocaleString()} है।`;
     }
     if (currentVoiceLang === 'bn-IN') {
         if (type === 'payee') return `দারুণ! আপনি <strong>${val1}</strong> কে পেমেন্ট করতে চান। 👍`;
@@ -122,6 +132,7 @@ function tDynamic(type, val1, val2) {
             if (val2.requiresReview) confirmMsg += `<br><br>🛡️ <em>বিজ্ঞপ্তি: ₹2,000 এর বেশি পরিমাণের জন্য একজন বিশ্বস্ত ব্যক্তির দ্বারা পর্যালোচনা প্রয়োজন।</em>`;
             return confirmMsg;
         }
+        if (type === 'balance_result') return `আপনার ব্যাঙ্ক ব্যালেন্স হল ₹${val1.toLocaleString()}।`;
     }
     // English
     if (type === 'payee') return `Great! You want to pay <strong>${val1}</strong>. 👍`;
@@ -133,6 +144,7 @@ function tDynamic(type, val1, val2) {
         if (val2.requiresReview) confirmMsg += `<br><br>🛡️ <em>Notice: Amounts over ₹2,000 require review by a trusted contact.</em>`;
         return confirmMsg;
     }
+    if (type === 'balance_result') return `Your bank balance is ₹${val1.toLocaleString()}.`;
 }
 
 function speakText(text) {
@@ -454,9 +466,64 @@ function saveSpendConfig() {
 }
 
 // ═══════════════════════════════════════════
+// HISTORY & BALANCE (NORMAL MODE)
+// ═══════════════════════════════════════════
+function openTransactionHistory() {
+    saveState();
+    const list = document.getElementById('normal-txn-list');
+    if (!list) return;
+
+    if (transactionHistory.length === 0) {
+        list.innerHTML = `<div class="elder-txn-empty">
+            <span class="material-icons-round" style="font-size:36px; color:#dadce0;">history</span>
+            <p>No transactions yet.</p>
+        </div>`;
+    } else {
+        list.innerHTML = transactionHistory.map(t => {
+            const initials = t.payee.split(' ').map(w => w[0]).join('');
+            return `<div class="elder-txn-item">
+                <div class="elder-txn-avatar" style="background:${t.color}">${initials}</div>
+                <div class="elder-txn-info">
+                    <strong>${t.payee}</strong>
+                    <span>${t.time} · ${t.status}</span>
+                </div>
+                <div class="elder-txn-amount sent">-₹${t.amount.toLocaleString()}</div>
+            </div>`;
+        }).join('');
+    }
+    document.getElementById('history-overlay').classList.add('active');
+}
+
+function closeHistory() {
+    document.getElementById('history-overlay').classList.remove('active');
+}
+
+function openCheckBalance() {
+    pinMode = 'balance';
+    document.getElementById('twofa-avatar').innerText = '🏦';
+    document.getElementById('twofa-payee-name').innerText = 'Check Bank Balance';
+    document.getElementById('twofa-payee-sub').innerText = 'Enter PIN to fetch balance';
+    document.getElementById('twofa-amount').innerText = ``;
+    document.getElementById('twofa-confirm-btn').innerText = `Check Balance`;
+    document.getElementById('twofa-warning').classList.remove('show');
+    
+    document.querySelectorAll('.twofa-pin-box').forEach(b => b.value = '');
+    document.getElementById('twofa-overlay').classList.add('active');
+    setTimeout(() => document.querySelectorAll('.twofa-pin-box')[0]?.focus(), 400);
+}
+
+function closeBalance() {
+    document.getElementById('balance-overlay').classList.remove('active');
+    if (voiceStep === 'check_balance_pin') {
+        closeVoice();
+    }
+}
+
+// ═══════════════════════════════════════════
 // 2FA PAYMENT
 // ═══════════════════════════════════════════
 function open2FA(payeeName, amount) {
+    pinMode = 'payment';
     pendingPayee = payeeName;
     pendingAmount = amount;
 
@@ -488,6 +555,17 @@ function confirm2FA() {
     const pins = Array.from(document.querySelectorAll('.twofa-pin-box')).map(b => b.value).join('');
     if (pins.length !== 4) {
         showToast('Enter your 4-digit UPI PIN');
+        return;
+    }
+
+    if (pinMode === 'balance') {
+        close2FA();
+        document.getElementById('balance-display').innerText = `₹${bankBalance.toLocaleString()}`;
+        document.getElementById('balance-overlay').classList.add('active');
+        if (voiceStep === 'check_balance_pin') {
+            addBubble('assistant', tDynamic('balance_result', bankBalance));
+            voiceStep = 'idle';
+        }
         return;
     }
 
@@ -532,9 +610,42 @@ function openVoice() {
     setTimeout(() => {
         addBubble('assistant', t("👋 Hi! I'm your GPay Assistant. I'm here to help you make a payment step by step."));
         setTimeout(() => {
-            addBubble('assistant', t('Who would you like to send money to?'));
-            showPeopleOptions();
-            voiceStep = 'ask_who';
+            addBubble('assistant', t('What would you like to do?'));
+            const chat = document.getElementById('voice-chat');
+            const optionsDiv = document.createElement('div');
+            optionsDiv.className = 'v-bubble options';
+
+            const payBtn = document.createElement('button');
+            payBtn.className = 'v-option-btn';
+            payBtn.innerText = t('💸 Make a Payment');
+            payBtn.onclick = () => {
+                addBubble('user', t('💸 Make a Payment'));
+                setTimeout(() => {
+                    addBubble('assistant', t('Who would you like to send money to?'));
+                    showPeopleOptions();
+                    voiceStep = 'ask_who';
+                }, 300);
+            };
+
+            const balBtn = document.createElement('button');
+            balBtn.className = 'v-option-btn';
+            balBtn.innerText = t('🏦 Check Bank Balance');
+            balBtn.onclick = () => {
+                addBubble('user', t('🏦 Check Bank Balance'));
+                voiceStep = 'check_balance_pin';
+                setTimeout(() => {
+                    addBubble('assistant', t('Okay, please enter your PIN to view your balance.'));
+                    setTimeout(() => {
+                        openCheckBalance();
+                    }, 800);
+                }, 300);
+            };
+
+            optionsDiv.appendChild(payBtn);
+            optionsDiv.appendChild(balBtn);
+            chat.appendChild(optionsDiv);
+            chat.scrollTop = chat.scrollHeight;
+            voiceStep = 'idle';
         }, 800);
     }, 300);
 }

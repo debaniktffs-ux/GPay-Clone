@@ -716,6 +716,30 @@ body {
 .twofa-btn.cancel { background: transparent; color: var(--google-blue); border: 1px solid var(--border-color); }
 .twofa-btn.confirm { background: var(--google-blue); color: #fff; }
 
+/* History & Balance Modals */
+.history-overlay, .balance-overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 550;
+    display: none;
+    flex-direction: column;
+    justify-content: flex-end;
+    border-radius: 36px;
+    overflow: hidden;
+}
+
+.history-overlay.active, .balance-overlay.active { display: flex; }
+
+.history-sheet, .balance-sheet {
+    background: var(--bg-light);
+    border-radius: 24px 24px 0 0;
+    padding: 24px;
+    max-height: 80%;
+    overflow-y: auto;
+    animation: slideUp 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
 /* Spend Limits Config Modal */
 .spend-config-overlay {
     position: absolute;
