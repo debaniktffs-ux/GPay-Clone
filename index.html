@@ -133,7 +133,7 @@
                         <span class="mode-title" id="mode-title">GPay</span>
                     </div>
                     <div class="mode-toggle-wrap">
-                        <span class="mode-label">Elderly Mode</span>
+                        <span class="mode-label">Easy Mode</span>
                         <label class="toggle-switch">
                             <input type="checkbox" id="elderly-toggle" onchange="toggleElderlyMode()">
                             <span class="toggle-slider"></span>
@@ -385,7 +385,7 @@
                         <span class="material-icons-round" style="color:#1a73e8; font-size:24px;">supervised_user_circle</span>
                         <h2>Get Transaction Reviewed</h2>
                     </div>
-                    <p class="reviewer-desc">Add a trusted person to review and approve this transaction before it's processed.</p>
+                    <p class="reviewer-desc">Select a trusted person to review and approve this transaction before it's processed.</p>
 
                     <div class="reviewer-txn-summary" id="reviewer-txn-summary">
                         <div class="rtxn-row"><span>To:</span><strong id="rtxn-payee">—</strong></div>
@@ -393,34 +393,47 @@
                         <div class="rtxn-row"><span>From:</span><strong id="rtxn-bank">—</strong></div>
                     </div>
 
-                    <div class="reviewer-form">
-                        <label>Reviewer Name</label>
-                        <input type="text" id="rev-name" placeholder="e.g. Mom, Dad, Ravi">
-
-                        <label>Phone Number</label>
-                        <input type="tel" id="rev-phone" placeholder="+91 98765 43210">
-
-                        <label>UPI ID</label>
-                        <input type="text" id="rev-upi" placeholder="reviewer@upi">
-
-                        <label>Relation</label>
-                        <select id="rev-relation">
-                            <option value="">Select relation...</option>
-                            <option value="Parent">Parent</option>
-                            <option value="Spouse">Spouse</option>
-                            <option value="Sibling">Sibling</option>
-                            <option value="Child">Child</option>
-                            <option value="Friend">Friend</option>
-                            <option value="Guardian">Guardian</option>
-                            <option value="Other">Other</option>
-                        </select>
+                    <!-- V1: Saved Reviewers List -->
+                    <div id="reviewer-list-container" style="display: none;">
+                        <h3 style="font-size:14px; color:var(--text-secondary); margin-bottom:12px; text-transform:uppercase; letter-spacing:0.5px;">Saved Reviewers</h3>
+                        <div id="modal-saved-reviewers"></div>
+                        <button class="elder-add-reviewer-btn" onclick="showReviewerForm()" style="margin-top:16px;">
+                            <span class="material-icons-round" style="font-size:18px;">add</span> Add New Reviewer
+                        </button>
                     </div>
 
-                    <button class="reviewer-send-btn" onclick="sendForReview()">
-                        <span class="material-icons-round" style="font-size:20px;">send</span>
-                        Send for Review
-                    </button>
-                    <button class="reviewer-cancel-btn" onclick="closeReviewerSetup()">Cancel</button>
+                    <!-- V2: New Reviewer Form -->
+                    <div id="reviewer-form-container">
+                        <h3 style="font-size:14px; color:var(--text-secondary); margin-bottom:12px; text-transform:uppercase; letter-spacing:0.5px;" id="rev-form-title">Add New Reviewer</h3>
+                        <div class="reviewer-form">
+                            <label>Reviewer Name</label>
+                            <input type="text" id="rev-name" placeholder="e.g. Mom, Dad, Ravi">
+
+                            <label>Phone Number</label>
+                            <input type="tel" id="rev-phone" placeholder="+91 98765 43210">
+
+                            <label>UPI ID</label>
+                            <input type="text" id="rev-upi" placeholder="reviewer@upi">
+
+                            <label>Relation</label>
+                            <select id="rev-relation">
+                                <option value="">Select relation...</option>
+                                <option value="Parent">Parent</option>
+                                <option value="Spouse">Spouse</option>
+                                <option value="Sibling">Sibling</option>
+                                <option value="Child">Child</option>
+                                <option value="Friend">Friend</option>
+                                <option value="Guardian">Guardian</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <button class="reviewer-send-btn" onclick="sendForReview()">
+                            <span class="material-icons-round" style="font-size:20px;">send</span>
+                            Send for Review
+                        </button>
+                    </div>
+
+                    <button class="reviewer-cancel-btn" id="rev-cancel-btn" onclick="handleReviewerModalCancel()">Cancel</button>
                 </div>
             </div>
 

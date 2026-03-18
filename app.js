@@ -45,7 +45,7 @@ let elderlyFontLevel = 0; // -1, 0, 1
 let transactionHistory = [];
 let savedReviewers = [];
 
-// Speech Recognition
+// Speech Recognition & Synthesis
 let recognition = null;
 if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -53,6 +53,26 @@ if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
     recognition.continuous = false;
     recognition.interimResults = false;
     recognition.lang = 'en-IN';
+}
+
+function speakText(text) {
+    if (!('speechSynthesis' in window)) return;
+    
+    // Strip rough HTML tags (e.g. <strong>, <br>) for cleaner speech
+    const cleanText = text.replace(/<[^>]+>/g, ' ').replace(/&[^;]+;/g, ' ');
+    
+    const utterance = new SpeechSynthesisUtterance(cleanText);
+    
+    // Try to find an Indian English voice
+    const voices = window.speechSynthesis.getVoices();
+    const isIndian = voices.find(v => v.lang.includes('en-IN') || v.name.includes('India'));
+    if (isIndian) {
+        utterance.voice = isIndian;
+    }
+    utterance.volume = 1;
+    utterance.rate = 1;
+    utterance.pitch = 1;
+    window.speechSynthesis.speak(utterance);
 }
 
 // ═══════════════════════════════════════════
@@ -373,6 +393,11 @@ function addBubble(type, text) {
     bubble.innerHTML = text;
     chat.appendChild(bubble);
     chat.scrollTop = chat.scrollHeight;
+
+    // Trigger TTS for assistant responses
+    if (type === 'assistant') {
+        speakText(text);
+    }
 }
 
 function showPeopleOptions() {
@@ -455,10 +480,15 @@ function selectBank(bank) {
 
     setTimeout(() => {
         const willExceed = currentSpend + voiceSelectedAmount > monthlyLimit;
+        const requiresReview = voiceSelectedAmount > 2000;
+        
         let confirmMsg = `Let me confirm:<br><br>📤 <strong>Pay ${voiceSelectedPayee}</strong><br>💰 <strong>₹${voiceSelectedAmount.toLocaleString()}</strong><br>🏦 <strong>From: ${voiceSelectedBank}</strong>`;
 
         if (willExceed) {
             confirmMsg += `<br><br>⚠️ <em>Warning: This will exceed your monthly limit of ₹${monthlyLimit.toLocaleString()}</em>`;
+        }
+        if (requiresReview) {
+            confirmMsg += `<br><br>🛡️ <em>Notice: Amounts over ₹2,000 require review by a trusted contact.</em>`;
         }
 
         addBubble('assistant', confirmMsg);
@@ -469,13 +499,16 @@ function selectBank(bank) {
             const optionsDiv = document.createElement('div');
             optionsDiv.className = 'v-bubble options';
 
-            const yesBtn = document.createElement('button');
-            yesBtn.className = 'v-option-btn';
-            yesBtn.innerText = '✅ Pay Now';
-            yesBtn.style.background = '#1a73e8';
-            yesBtn.style.color = '#fff';
-            yesBtn.style.border = 'none';
-            yesBtn.onclick = () => confirmVoicePayment();
+            if (!requiresReview) {
+                const yesBtn = document.createElement('button');
+                yesBtn.className = 'v-option-btn';
+                yesBtn.innerText = '✅ Pay Now';
+                yesBtn.style.background = '#1a73e8';
+                yesBtn.style.color = '#fff';
+                yesBtn.style.border = 'none';
+                yesBtn.onclick = () => confirmVoicePayment();
+                optionsDiv.appendChild(yesBtn);
+            }
 
             const reviewBtn = document.createElement('button');
             reviewBtn.className = 'v-option-btn';
@@ -490,7 +523,6 @@ function selectBank(bank) {
             noBtn.innerText = '❌ Cancel';
             noBtn.onclick = () => cancelVoicePayment();
 
-            optionsDiv.appendChild(yesBtn);
             optionsDiv.appendChild(reviewBtn);
             optionsDiv.appendChild(noBtn);
             chat.appendChild(optionsDiv);
@@ -674,15 +706,69 @@ function openReviewerSetup() {
     document.getElementById('rtxn-amount').innerText = `₹${(voiceSelectedAmount || pendingAmount || 0).toLocaleString()}`;
     document.getElementById('rtxn-bank').innerText = voiceSelectedBank || 'Default Account';
 
-    // Pre-fill reviewer if saved
-    if (savedReviewer) {
-        document.getElementById('rev-name').value = savedReviewer.name || '';
-        document.getElementById('rev-phone').value = savedReviewer.phone || '';
-        document.getElementById('rev-upi').value = savedReviewer.upi || '';
-        document.getElementById('rev-relation').value = savedReviewer.relation || '';
+    const listContainer = document.getElementById('reviewer-list-container');
+    const formContainer = document.getElementById('reviewer-form-container');
+    const cancelBtn = document.getElementById('rev-cancel-btn');
+
+    if (savedReviewers.length > 0) {
+        // Show the list of saved reviewers
+        listContainer.style.display = 'block';
+        formContainer.style.display = 'none';
+        cancelBtn.innerText = 'Cancel';
+        
+        const modalList = document.getElementById('modal-saved-reviewers');
+        modalList.innerHTML = savedReviewers.map((r, idx) => {
+            const initials = r.name.split(' ').map(w => w[0]).join('').toUpperCase();
+            return `<div class="elder-reviewer-item" style="cursor:pointer;" onclick="selectSavedReviewer(${idx})">
+                <div class="elder-reviewer-avatar">${initials}</div>
+                <div class="elder-reviewer-info">
+                    <strong>${r.name}</strong>
+                    <span>${r.phone} · ${r.relation}</span>
+                </div>
+                <span class="material-icons-round" style="color:var(--google-blue);">chevron_right</span>
+            </div>`;
+        }).join('');
+    } else {
+        // Show the form directly if no saved reviewers
+        showReviewerForm();
     }
 
     document.getElementById('reviewer-overlay').classList.add('active');
+}
+
+function showReviewerForm() {
+    document.getElementById('reviewer-list-container').style.display = 'none';
+    document.getElementById('reviewer-form-container').style.display = 'block';
+    
+    // Change cancel button to go back to list if there are saved reviewers
+    const cancelBtn = document.getElementById('rev-cancel-btn');
+    if (savedReviewers.length > 0) {
+        cancelBtn.innerText = 'Back to Saved Reviewers';
+        document.getElementById('rev-form-title').innerText = 'Add New Reviewer';
+    } else {
+        cancelBtn.innerText = 'Cancel';
+        document.getElementById('rev-form-title').innerText = 'Reviewer Details';
+    }
+}
+
+function handleReviewerModalCancel() {
+    const cancelBtn = document.getElementById('rev-cancel-btn');
+    if (cancelBtn.innerText === 'Back to Saved Reviewers') {
+        document.getElementById('reviewer-form-container').style.display = 'none';
+        document.getElementById('reviewer-list-container').style.display = 'block';
+        cancelBtn.innerText = 'Cancel';
+    } else {
+        closeReviewerSetup();
+    }
+}
+
+function selectSavedReviewer(idx) {
+    const r = savedReviewers[idx];
+    document.getElementById('rev-name').value = r.name;
+    document.getElementById('rev-phone').value = r.phone;
+    document.getElementById('rev-upi').value = r.upi;
+    document.getElementById('rev-relation').value = r.relation;
+    sendForReview();
 }
 
 function closeReviewerSetup() {
