@@ -1474,3 +1474,5 @@ body {
 .elderly-font-small .elder-voice-text strong,
 .elderly-font-small .elder-section-header h3 { font-size: 14px; }
 .elderly-font-small .elder-spend-amount { font-size: 24px; }
+/* Utility */
+#home-screen.hidden { display: none; }

@@ -64,7 +64,12 @@ let currentVoiceLang = 'en-IN';
 // Supabase Configuration (Placeholder - User needs to replace)
 const SUPABASE_URL = 'YOUR_SUPABASE_URL';
 const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
-const supabase = typeof supabase !== 'undefined' ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+// Only initialize if URL is provided and not placeholder
+const isSupabaseConfigured = SUPABASE_URL && SUPABASE_URL !== 'YOUR_SUPABASE_URL';
+const supabase = (isSupabaseConfigured && typeof window.supabase !== 'undefined') 
+    ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) 
+    : null;
 const USER_ID = 'gpay_primary_user'; // Hardcoded for prototype persistence
 
 const translations = {
