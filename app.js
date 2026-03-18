@@ -1163,6 +1163,8 @@ function sendForReview() {
     openPendingReview();
 }
 
+let pendingTimerInterval = null;
+
 function openPendingReview() {
     if (!pendingReviewTransaction) return;
     const txn = pendingReviewTransaction;
@@ -1175,15 +1177,43 @@ function openPendingReview() {
 
     document.getElementById('pending-overlay').classList.add('active');
     showToast(`Review request sent to ${txn.reviewer.name} 📩`);
+
+    let timeLeft = 300;
+    const timerEl = document.getElementById('pending-timer');
+    if(timerEl) timerEl.innerText = `Expires in: 05:00`;
+    
+    clearInterval(pendingTimerInterval);
+    pendingTimerInterval = setInterval(() => {
+        timeLeft--;
+        if (timeLeft <= 0) {
+            clearInterval(pendingTimerInterval);
+            expirePendingReview();
+        } else {
+            const m = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+            const s = (timeLeft % 60).toString().padStart(2, '0');
+            if(timerEl) timerEl.innerText = `Expires in: ${m}:${s}`;
+        }
+    }, 1000);
 }
 
 function cancelPendingReview() {
+    clearInterval(pendingTimerInterval);
     document.getElementById('pending-overlay').classList.remove('active');
     pendingReviewTransaction = null;
     showToast('Transaction cancelled');
 }
 
+function expirePendingReview() {
+    document.getElementById('pending-overlay').classList.remove('active');
+    if (pendingReviewTransaction) {
+        addTransaction(pendingReviewTransaction.payee, pendingReviewTransaction.amount, 'Expired ❌');
+        showToast(`Transaction expired! ${pendingReviewTransaction.reviewer.name} did not respond in time.`);
+    }
+    pendingReviewTransaction = null;
+}
+
 function simulateReviewerResponse() {
+    clearInterval(pendingTimerInterval);
     document.getElementById('pending-overlay').classList.remove('active');
 
     // Open the reviewer's approval screen
