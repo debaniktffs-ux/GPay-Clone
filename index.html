@@ -217,6 +217,22 @@
                         <span class="material-icons-round" style="color:var(--google-blue); font-size:28px;">arrow_forward_ios</span>
                     </div>
 
+                    <!-- Voice Settings -->
+                    <div class="elder-voice-settings">
+                        <div class="voice-setting-item">
+                            <span class="material-icons-round" style="font-size:18px; color:var(--text-secondary);">language</span>
+                            <select id="elder-lang-select" onchange="changeVoiceLanguage()">
+                                <option value="en-IN">English (India)</option>
+                                <option value="hi-IN">Hindi (हिंदी)</option>
+                                <option value="bn-IN">Bengali (বাংলা)</option>
+                            </select>
+                        </div>
+                        <button class="voice-setting-mute" id="elder-mute-btn" onclick="toggleVoiceMute()">
+                            <span class="material-icons-round" id="mute-icon" style="font-size:18px;">volume_up</span>
+                            <span id="mute-text">Sound On</span>
+                        </button>
+                    </div>
+
                     <!-- Spend Limits (Large) -->
                     <div class="elder-spend-card">
                         <h3>💰 Monthly Spending</h3>
@@ -253,12 +269,11 @@
                         <div class="elder-reviewer-list" id="elder-reviewer-list">
                             <div class="elder-txn-empty">
                                 <span class="material-icons-round" style="font-size:36px; color:#dadce0;">group</span>
-                                <p>No reviewers added yet.<br>Add one during a payment.</p>
+                                <p>No reviewers added yet.<br>Add one below or during a payment.</p>
                             </div>
                         </div>
-                        <button class="elder-add-reviewer-btn" onclick="openReviewerSetup()">
-                            <span class="material-icons-round" style="font-size:18px;">person_add</span>
-                            Add Trusted Reviewer
+                        <button class="elder-add-reviewer-btn" onclick="openStandaloneReviewerModal()">
+                            <span class="material-icons-round" style="font-size:18px;">person_add</span> Add Trusted Reviewer
                         </button>
                     </div>
 
@@ -427,9 +442,9 @@
                                 <option value="Other">Other</option>
                             </select>
                         </div>
-                        <button class="reviewer-send-btn" onclick="sendForReview()">
-                            <span class="material-icons-round" style="font-size:20px;">send</span>
-                            Send for Review
+                        <button class="reviewer-send-btn" id="rev-submit-btn" onclick="sendForReview()">
+                            <span class="material-icons-round" id="rev-submit-icon" style="font-size:20px;">send</span>
+                            <span id="rev-submit-text">Send for Review</span>
                         </button>
                     </div>
 

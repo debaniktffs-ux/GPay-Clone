@@ -1170,6 +1170,56 @@ body {
     box-shadow: 0 4px 16px rgba(26,115,232,0.15);
 }
 
+/* Voice Settings */
+.elder-voice-settings {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    padding: 0 4px;
+}
+
+.voice-setting-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--bg-light);
+    border: 1px solid var(--border-color);
+    padding: 8px 12px;
+    border-radius: 20px;
+}
+
+.voice-setting-item select {
+    border: none;
+    background: transparent;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-primary);
+    cursor: pointer;
+    outline: none;
+    font-family: inherit;
+}
+
+.voice-setting-mute {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #e8f0fe;
+    color: var(--google-blue);
+    border: none;
+    padding: 8px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.voice-setting-mute.muted {
+    background: #fce8e6;
+    color: #d93025;
+}
+
 .elder-voice-icon-wrap {
     width: 56px;
     height: 56px;

@@ -55,30 +55,93 @@ if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
     recognition.lang = 'en-IN';
 }
 
+// Voice State
+let isVoiceMuted = false;
+let currentVoiceLang = 'en-IN';
+
 function speakText(text) {
-    if (!('speechSynthesis' in window)) return;
+    if (!('speechSynthesis' in window) || isVoiceMuted) return;
     
-    // Strip rough HTML tags (e.g. <strong>, <br>) for cleaner speech
-    const cleanText = text.replace(/<[^>]+>/g, ' ').replace(/&[^;]+;/g, ' ');
+    // Strip rough HTML tags and all Emojis/Pictographics
+    let cleanText = text.replace(/<[^>]+>/g, ' ').replace(/&[^;]+;/g, ' ');
+    cleanText = cleanText.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '');
     
     const utterance = new SpeechSynthesisUtterance(cleanText);
     
-    // Try to find an Indian English voice
+    // Set language and try to find matching voice
+    utterance.lang = currentVoiceLang;
     const voices = window.speechSynthesis.getVoices();
-    const isIndian = voices.find(v => v.lang.includes('en-IN') || v.name.includes('India'));
-    if (isIndian) {
-        utterance.voice = isIndian;
+    const matchingVoice = voices.find(v => v.lang.includes(currentVoiceLang) || (currentVoiceLang === 'en-IN' && v.name.includes('India')));
+    if (matchingVoice) {
+        utterance.voice = matchingVoice;
     }
+    
     utterance.volume = 1;
     utterance.rate = 1;
     utterance.pitch = 1;
     window.speechSynthesis.speak(utterance);
 }
 
+function changeVoiceLanguage() {
+    const select = document.getElementById('elder-lang-select');
+    currentVoiceLang = select.value;
+    if (recognition) {
+        recognition.lang = currentVoiceLang;
+    }
+    showToast('Voice language updated ✓');
+}
+
+function toggleVoiceMute() {
+    isVoiceMuted = !isVoiceMuted;
+    const btn = document.getElementById('elder-mute-btn');
+    const icon = document.getElementById('mute-icon');
+    const text = document.getElementById('mute-text');
+    
+    if (isVoiceMuted) {
+        btn.classList.add('muted');
+        icon.innerText = 'volume_off';
+        text.innerText = 'Voice Muted';
+        window.speechSynthesis.cancel(); // Stop current speech
+        showToast('Voice Assistant muted');
+    } else {
+        btn.classList.remove('muted');
+        icon.innerText = 'volume_up';
+        text.innerText = 'Sound On';
+        showToast('Voice Assistant unmuted');
+    }
+}
+
+// ═══════════════════════════════════════════
+// PERSISTENCE (Local Storage)
+// ═══════════════════════════════════════════
+function saveState() {
+    const state = {
+        currentSpend,
+        transactionHistory,
+        savedReviewers
+    };
+    localStorage.setItem('gpayCloneState', JSON.stringify(state));
+}
+
+function loadState() {
+    const saved = localStorage.getItem('gpayCloneState');
+    if (saved) {
+        try {
+            const state = JSON.parse(saved);
+            if (state.currentSpend !== undefined) currentSpend = state.currentSpend;
+            if (state.transactionHistory) transactionHistory = state.transactionHistory;
+            if (state.savedReviewers) savedReviewers = state.savedReviewers;
+        } catch (e) {
+            console.error('Failed to parse saved state', e);
+        }
+    }
+}
+
 // ═══════════════════════════════════════════
 // INITIALIZATION
 // ═══════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', () => {
+    loadState();
     populatePeople();
     updateSpendBanner();
     setupPinAutoFocus();
@@ -181,6 +244,7 @@ function changeFontSize(level) {
 }
 
 function updateElderlySpend() {
+    saveState();
     const pct = monthlyLimit > 0 ? Math.min((currentSpend / monthlyLimit) * 100, 100) : 0;
     const remaining = Math.max(monthlyLimit - currentSpend, 0);
 
@@ -211,6 +275,7 @@ function addTransaction(payee, amount, status) {
 }
 
 function renderElderlyTransactions() {
+    saveState();
     const list = document.getElementById('elder-txn-list');
     if (!list) return;
 
@@ -236,13 +301,14 @@ function renderElderlyTransactions() {
 }
 
 function renderElderlyReviewers() {
+    saveState();
     const list = document.getElementById('elder-reviewer-list');
     if (!list) return;
 
     if (savedReviewers.length === 0) {
         list.innerHTML = `<div class="elder-txn-empty">
             <span class="material-icons-round" style="font-size:36px; color:#dadce0;">group</span>
-            <p>No reviewers added yet.<br>Add one during a payment.</p>
+            <p>No reviewers added yet.<br>Add one below or during a payment.</p>
         </div>`;
         return;
     }
@@ -264,6 +330,7 @@ function renderElderlyReviewers() {
 // SPEND LIMITS
 // ═══════════════════════════════════════════
 function updateSpendBanner() {
+    saveState();
     const pct = monthlyLimit > 0 ? Math.min((currentSpend / monthlyLimit) * 100, 100) : 0;
     const fill = document.getElementById('slb-fill');
     const text = document.getElementById('slb-text');
@@ -775,6 +842,34 @@ function closeReviewerSetup() {
     document.getElementById('reviewer-overlay').classList.remove('active');
 }
 
+function openStandaloneReviewerModal() {
+    // Hide payment context
+    document.getElementById('reviewer-txn-summary').style.display = 'none';
+    
+    // Change button text and icon
+    document.getElementById('rev-submit-text').innerText = 'Save Reviewer';
+    document.getElementById('rev-submit-icon').innerText = 'save';
+    
+    // Open the modal, directly to form
+    const listContainer = document.getElementById('reviewer-list-container');
+    const formContainer = document.getElementById('reviewer-form-container');
+    const cancelBtn = document.getElementById('rev-cancel-btn');
+    
+    listContainer.style.display = 'none';
+    formContainer.style.display = 'block';
+    
+    cancelBtn.innerText = 'Cancel';
+    document.getElementById('rev-form-title').innerText = 'New Reviewer Details';
+    
+    // Clear inputs
+    document.getElementById('rev-name').value = '';
+    document.getElementById('rev-phone').value = '';
+    document.getElementById('rev-upi').value = '';
+    document.getElementById('rev-relation').value = '';
+
+    document.getElementById('reviewer-overlay').classList.add('active');
+}
+
 function sendForReview() {
     const name = document.getElementById('rev-name').value.trim();
     const phone = document.getElementById('rev-phone').value.trim();
@@ -793,8 +888,16 @@ function sendForReview() {
         savedReviewers.push({ name, phone, upi, relation });
         renderElderlyReviewers();
     }
+    
+    // Check if we are in standalone add mode
+    const submitBtnText = document.getElementById('rev-submit-text').innerText;
+    if (submitBtnText === 'Save Reviewer') {
+        closeReviewerSetup();
+        showToast(`${name} added to Trusted Reviewers ✓`);
+        return;
+    }
 
-    // Create the pending review transaction
+    // Otherwise, continue the payment flow
     pendingReviewTransaction = {
         payee: voiceSelectedPayee || pendingPayee,
         amount: voiceSelectedAmount || pendingAmount,
