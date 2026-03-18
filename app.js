@@ -61,6 +61,12 @@ if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
 let isVoiceMuted = false;
 let currentVoiceLang = 'en-IN';
 
+// Supabase Configuration (Placeholder - User needs to replace)
+const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+const supabase = typeof supabase !== 'undefined' ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+const USER_ID = 'gpay_primary_user'; // Hardcoded for prototype persistence
+
 const translations = {
     'hi-IN': {
         "👋 Hi! I'm your GPay Assistant. I'm here to help you make a payment step by step.": "नमस्ते! मैं आपका जी-पे असिस्टेंट हूँ। मैं आपको भुगतान करने में मदद करूँगा।",
@@ -207,9 +213,9 @@ function toggleVoiceMute() {
 }
 
 // ═══════════════════════════════════════════
-// PERSISTENCE (Local Storage)
+// PERSISTENCE (Supabase Backend)
 // ═══════════════════════════════════════════
-function saveState() {
+async function saveState() {
     const state = {
         currentSpend,
         monthlyLimit,
@@ -218,31 +224,72 @@ function saveState() {
         savedReviewers,
         elderlyMode
     };
+    
+    // Save to localStorage as fallback
     localStorage.setItem('gpayCloneState', JSON.stringify(state));
+
+    // Save to Supabase if configured
+    if (supabase) {
+        try {
+            const { error } = await supabase
+                .from('app_state')
+                .upsert({ id: USER_ID, data: state }, { onConflict: 'id' });
+            
+            if (error) console.error('Supabase save error:', error.message);
+        } catch (e) {
+            console.error('Supabase connection failed', e);
+        }
+    }
 }
 
-function loadState() {
+async function loadState() {
+    // 1. Try to load from Supabase first
+    if (supabase) {
+        try {
+            const { data, error } = await supabase
+                .from('app_state')
+                .select('data')
+                .eq('id', USER_ID)
+                .single();
+
+            if (data && data.data) {
+                applyState(data.data);
+                console.log('State loaded from Supabase ✓');
+                return;
+            }
+            if (error) console.warn('Supabase fetch issue (expected if new project):', error.message);
+        } catch (e) {
+            console.error('Supabase connection error', e);
+        }
+    }
+
+    // 2. Fallback to localStorage
     const saved = localStorage.getItem('gpayCloneState');
     if (saved) {
         try {
             const state = JSON.parse(saved);
-            if (state.currentSpend !== undefined) currentSpend = state.currentSpend;
-            if (state.monthlyLimit !== undefined) monthlyLimit = state.monthlyLimit;
-            if (state.bankBalance !== undefined) bankBalance = state.bankBalance;
-            if (state.transactionHistory) transactionHistory = state.transactionHistory;
-            if (state.savedReviewers) savedReviewers = state.savedReviewers;
-            if (state.elderlyMode !== undefined) elderlyMode = state.elderlyMode;
+            applyState(state);
+            console.log('State loaded from LocalStorage (Fallback) ✓');
         } catch (e) {
             console.error('Failed to parse saved state', e);
         }
     }
 }
 
+function applyState(state) {
+    if (state.currentSpend !== undefined) currentSpend = state.currentSpend;
+    if (state.monthlyLimit !== undefined) monthlyLimit = state.monthlyLimit;
+    if (state.bankBalance !== undefined) bankBalance = state.bankBalance;
+    if (state.transactionHistory) transactionHistory = state.transactionHistory;
+    if (state.savedReviewers) savedReviewers = state.savedReviewers;
+    if (state.elderlyMode !== undefined) elderlyMode = state.elderlyMode;
+}
+
 // ═══════════════════════════════════════════
 // INITIALIZATION
 // ═══════════════════════════════════════════
-document.addEventListener('DOMContentLoaded', () => {
-    loadState();
+document.addEventListener('DOMContentLoaded', async () => {
+    await loadState();
     
     // Apply layout state
     if (elderlyMode) {
