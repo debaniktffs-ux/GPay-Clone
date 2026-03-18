@@ -127,8 +127,22 @@
                     </div>
                 </div>
 
-                <!-- GPay Body -->
-                <div class="gpay-body">
+                <!-- ★ MODE TOGGLE BAR ★ -->
+                <div class="mode-toggle-bar">
+                    <div class="mode-title-wrap">
+                        <span class="mode-title" id="mode-title">GPay</span>
+                    </div>
+                    <div class="mode-toggle-wrap">
+                        <span class="mode-label">Elderly Mode</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="elderly-toggle" onchange="toggleElderlyMode()">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- ═══ REGULAR GPay Body ═══ -->
+                <div class="gpay-body" id="regular-body">
                     <!-- Quick Actions -->
                     <div class="gpay-actions-grid">
                         <div class="gpay-action" onclick="showToast('Scan QR')"><div class="gpay-action-icon"><span class="material-icons-outlined">qr_code_scanner</span></div><p>Scan any<br>QR code</p></div>
@@ -176,6 +190,97 @@
                     <div style="text-align: center; padding: 24px 0;">
                         <span class="material-icons-round" style="color: #dadce0; font-size: 28px;">security</span>
                         <p style="font-size: 11px; color: #5f6368; margin-top: 6px;">Your money is safe and secure</p>
+                    </div>
+                </div>
+
+                <!-- ═══ ELDERLY / GUARDIAN PAY Body ═══ -->
+                <div class="gpay-body elderly-body" id="elderly-body" style="display:none;">
+
+                    <!-- Font Size Controls -->
+                    <div class="elder-font-controls">
+                        <span class="material-icons-round" style="font-size:18px; color:var(--text-secondary);">text_fields</span>
+                        <span class="elder-font-label">Text Size</span>
+                        <button class="elder-font-btn" onclick="changeFontSize(-1)">A<sup>−</sup></button>
+                        <button class="elder-font-btn" onclick="changeFontSize(0)">A</button>
+                        <button class="elder-font-btn" onclick="changeFontSize(1)">A<sup>+</sup></button>
+                    </div>
+
+                    <!-- Big Voice Assistant Button -->
+                    <div class="elder-voice-btn" onclick="openVoice()">
+                        <div class="elder-voice-icon-wrap">
+                            <span class="material-icons-round elder-voice-icon">mic</span>
+                        </div>
+                        <div class="elder-voice-text">
+                            <strong>Voice Assistant</strong>
+                            <span>Tap to speak your payment</span>
+                        </div>
+                        <span class="material-icons-round" style="color:var(--google-blue); font-size:28px;">arrow_forward_ios</span>
+                    </div>
+
+                    <!-- Spend Limits (Large) -->
+                    <div class="elder-spend-card">
+                        <h3>💰 Monthly Spending</h3>
+                        <div class="elder-spend-amount" id="elder-spend-amount">₹8,500 <span>/ ₹10,000</span></div>
+                        <div class="slb-progress-track" style="height:12px;">
+                            <div class="slb-progress-fill" id="elder-slb-fill" style="width:85%;"></div>
+                        </div>
+                        <div class="elder-spend-remaining" id="elder-spend-remaining">₹1,500 remaining</div>
+                        <button class="elder-edit-limit" onclick="openSpendConfig()">
+                            <span class="material-icons-round" style="font-size:16px;">edit</span> Edit Limit
+                        </button>
+                    </div>
+
+                    <!-- Live Transactions -->
+                    <div class="elder-section">
+                        <div class="elder-section-header">
+                            <span class="material-icons-round" style="color:var(--google-blue);">receipt_long</span>
+                            <h3>Recent Transactions</h3>
+                        </div>
+                        <div class="elder-txn-list" id="elder-txn-list">
+                            <div class="elder-txn-empty">
+                                <span class="material-icons-round" style="font-size:36px; color:#dadce0;">history</span>
+                                <p>No transactions yet.<br>Use Voice Assistant to make a payment.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Trusted Reviewers -->
+                    <div class="elder-section">
+                        <div class="elder-section-header">
+                            <span class="material-icons-round" style="color:#34a853;">verified_user</span>
+                            <h3>Trusted Reviewers</h3>
+                        </div>
+                        <div class="elder-reviewer-list" id="elder-reviewer-list">
+                            <div class="elder-txn-empty">
+                                <span class="material-icons-round" style="font-size:36px; color:#dadce0;">group</span>
+                                <p>No reviewers added yet.<br>Add one during a payment.</p>
+                            </div>
+                        </div>
+                        <button class="elder-add-reviewer-btn" onclick="openReviewerSetup()">
+                            <span class="material-icons-round" style="font-size:18px;">person_add</span>
+                            Add Trusted Reviewer
+                        </button>
+                    </div>
+
+                    <!-- Quick Help -->
+                    <div class="elder-section">
+                        <div class="elder-section-header">
+                            <span class="material-icons-round" style="color:#ea4335;">help_outline</span>
+                            <h3>Quick Help</h3>
+                        </div>
+                        <div class="elder-help-card" onclick="showToast('Calling helpline...')">
+                            <span class="material-icons-round" style="font-size:28px; color:#ea4335;">call</span>
+                            <div><strong>Emergency Helpline</strong><br><span>Call GPay support</span></div>
+                        </div>
+                        <div class="elder-help-card" onclick="showToast('Opening tutorial...')">
+                            <span class="material-icons-round" style="font-size:28px; color:var(--google-blue);">play_circle</span>
+                            <div><strong>How to Use</strong><br><span>Watch a quick tutorial</span></div>
+                        </div>
+                    </div>
+
+                    <div style="text-align: center; padding: 24px 0;">
+                        <span class="material-icons-round" style="color: #34a853; font-size: 32px;">shield</span>
+                        <p style="font-size: 13px; color: #5f6368; margin-top: 6px; font-weight:500;">Guardian Pay keeps your money safe</p>
                     </div>
                 </div>
 

@@ -39,6 +39,12 @@ let pendingReviewTransaction = null;
 let savedReviewer = null;
 let voiceSelectedAmount = 0;
 
+// Elderly / Guardian Pay Mode
+let elderlyMode = false;
+let elderlyFontLevel = 0; // -1, 0, 1
+let transactionHistory = [];
+let savedReviewers = [];
+
 // Speech Recognition
 let recognition = null;
 if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
@@ -100,6 +106,138 @@ function closeGPay() {
     setTimeout(() => {
         document.getElementById('home-screen').classList.remove('hidden');
     }, 100);
+}
+
+// ═══════════════════════════════════════════
+// ELDERLY / GUARDIAN PAY MODE
+// ═══════════════════════════════════════════
+function toggleElderlyMode() {
+    elderlyMode = document.getElementById('elderly-toggle').checked;
+    const title = document.getElementById('mode-title');
+    const regularBody = document.getElementById('regular-body');
+    const elderlyBody = document.getElementById('elderly-body');
+
+    if (elderlyMode) {
+        // Animate title: GPay → Guardian Pay
+        title.style.opacity = '0';
+        title.style.transform = 'scale(0.8)';
+        setTimeout(() => {
+            title.innerText = '🛡️ Guardian Pay';
+            title.classList.add('guardian');
+            title.style.opacity = '1';
+            title.style.transform = 'scale(1)';
+        }, 250);
+
+        regularBody.style.display = 'none';
+        elderlyBody.style.display = 'block';
+        updateElderlySpend();
+        renderElderlyTransactions();
+        renderElderlyReviewers();
+        showToast('Guardian Pay mode activated 🛡️');
+    } else {
+        // Animate title: Guardian Pay → GPay
+        title.style.opacity = '0';
+        title.style.transform = 'scale(0.8)';
+        setTimeout(() => {
+            title.innerText = 'GPay';
+            title.classList.remove('guardian');
+            title.style.opacity = '1';
+            title.style.transform = 'scale(1)';
+        }, 250);
+
+        regularBody.style.display = 'block';
+        elderlyBody.style.display = 'none';
+        showToast('Switched to regular mode');
+    }
+}
+
+function changeFontSize(level) {
+    const body = document.getElementById('elderly-body');
+    body.classList.remove('elderly-font-small', 'elderly-font-large');
+    elderlyFontLevel = level;
+    if (level === 1) body.classList.add('elderly-font-large');
+    else if (level === -1) body.classList.add('elderly-font-small');
+    showToast(level === 1 ? 'Text size: Large' : level === -1 ? 'Text size: Small' : 'Text size: Normal');
+}
+
+function updateElderlySpend() {
+    const pct = monthlyLimit > 0 ? Math.min((currentSpend / monthlyLimit) * 100, 100) : 0;
+    const remaining = Math.max(monthlyLimit - currentSpend, 0);
+
+    const amountEl = document.getElementById('elder-spend-amount');
+    const fillEl = document.getElementById('elder-slb-fill');
+    const remainEl = document.getElementById('elder-spend-remaining');
+
+    if (amountEl) amountEl.innerHTML = `₹${currentSpend.toLocaleString()} <span>/ ₹${monthlyLimit.toLocaleString()}</span>`;
+    if (fillEl) {
+        fillEl.style.width = pct + '%';
+        fillEl.className = 'slb-progress-fill' + (pct > 90 ? ' danger' : pct > 70 ? ' warning' : '');
+    }
+    if (remainEl) {
+        remainEl.innerText = `₹${remaining.toLocaleString()} remaining`;
+        remainEl.style.color = pct > 90 ? '#d93025' : pct > 70 ? '#f9ab00' : '#1e8e3e';
+    }
+}
+
+function addTransaction(payee, amount, status) {
+    const now = new Date();
+    const time = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+    transactionHistory.unshift({
+        payee, amount, status, time,
+        color: people.find(p => p.name === payee)?.color || '#1a73e8'
+    });
+    if (transactionHistory.length > 20) transactionHistory.pop();
+    renderElderlyTransactions();
+}
+
+function renderElderlyTransactions() {
+    const list = document.getElementById('elder-txn-list');
+    if (!list) return;
+
+    if (transactionHistory.length === 0) {
+        list.innerHTML = `<div class="elder-txn-empty">
+            <span class="material-icons-round" style="font-size:36px; color:#dadce0;">history</span>
+            <p>No transactions yet.<br>Use Voice Assistant to make a payment.</p>
+        </div>`;
+        return;
+    }
+
+    list.innerHTML = transactionHistory.map(t => {
+        const initials = t.payee.split(' ').map(w => w[0]).join('');
+        return `<div class="elder-txn-item">
+            <div class="elder-txn-avatar" style="background:${t.color}">${initials}</div>
+            <div class="elder-txn-info">
+                <strong>${t.payee}</strong>
+                <span>${t.time} · ${t.status}</span>
+            </div>
+            <div class="elder-txn-amount sent">-₹${t.amount.toLocaleString()}</div>
+        </div>`;
+    }).join('');
+}
+
+function renderElderlyReviewers() {
+    const list = document.getElementById('elder-reviewer-list');
+    if (!list) return;
+
+    if (savedReviewers.length === 0) {
+        list.innerHTML = `<div class="elder-txn-empty">
+            <span class="material-icons-round" style="font-size:36px; color:#dadce0;">group</span>
+            <p>No reviewers added yet.<br>Add one during a payment.</p>
+        </div>`;
+        return;
+    }
+
+    list.innerHTML = savedReviewers.map(r => {
+        const initials = r.name.split(' ').map(w => w[0]).join('').toUpperCase();
+        return `<div class="elder-reviewer-item">
+            <div class="elder-reviewer-avatar">${initials}</div>
+            <div class="elder-reviewer-info">
+                <strong>${r.name}</strong>
+                <span>${r.phone} · ${r.relation}</span>
+            </div>
+            <span class="elder-reviewer-badge">${r.relation}</span>
+        </div>`;
+    }).join('');
 }
 
 // ═══════════════════════════════════════════
@@ -190,6 +328,8 @@ function confirm2FA() {
     close2FA();
     currentSpend += pendingAmount;
     updateSpendBanner();
+    updateElderlySpend();
+    addTransaction(pendingPayee, pendingAmount, 'Paid ✓');
 
     setTimeout(() => {
         showToast(`₹${pendingAmount.toLocaleString()} sent to ${pendingPayee} ✓`);
@@ -561,6 +701,12 @@ function sendForReview() {
 
     // Save reviewer for future use
     savedReviewer = { name, phone, upi, relation };
+
+    // Add to savedReviewers list if not already there
+    if (!savedReviewers.find(r => r.phone === phone)) {
+        savedReviewers.push({ name, phone, upi, relation });
+        renderElderlyReviewers();
+    }
 
     // Create the pending review transaction
     pendingReviewTransaction = {

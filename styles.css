@@ -1033,3 +1033,369 @@ body {
 }
 
 .approval-btn.approve:hover { background: var(--google-green); color: #fff; }
+
+/* ███ MODE TOGGLE BAR ███ */
+.mode-toggle-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 16px;
+    background: linear-gradient(135deg, #e8f0fe, #f1f3f4);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.mode-title-wrap { display: flex; align-items: center; }
+
+.mode-title {
+    font-family: 'Google Sans', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--google-blue);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.mode-title.guardian {
+    color: #34a853;
+    font-size: 17px;
+    letter-spacing: 0.5px;
+}
+
+.mode-toggle-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.mode-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+/* Toggle Switch */
+.toggle-switch {
+    position: relative;
+    width: 44px;
+    height: 24px;
+    display: inline-block;
+}
+
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+
+.toggle-slider {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: #ccc;
+    border-radius: 24px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.toggle-slider::before {
+    content: '';
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #fff;
+    bottom: 3px;
+    left: 3px;
+    transition: transform 0.3s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.toggle-switch input:checked + .toggle-slider {
+    background: #34a853;
+}
+
+.toggle-switch input:checked + .toggle-slider::before {
+    transform: translateX(20px);
+}
+
+/* ███ ELDERLY MODE BODY ███ */
+.elderly-body {
+    padding: 0 16px 90px 16px;
+}
+
+/* Font Size Controls */
+.elder-font-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 16px;
+}
+
+.elder-font-label { font-size: 13px; color: var(--text-secondary); font-weight: 500; flex: 1; }
+
+.elder-font-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-light);
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-primary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.elder-font-btn:hover { background: var(--google-blue-bg); border-color: var(--google-blue); color: var(--google-blue); }
+.elder-font-btn sup { font-size: 10px; }
+
+/* Voice Assistant Big Button */
+.elder-voice-btn {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px;
+    background: linear-gradient(135deg, #e8f0fe, #dbeefe);
+    border-radius: 20px;
+    cursor: pointer;
+    border: 1px solid rgba(26,115,232,0.2);
+    margin-bottom: 16px;
+    transition: transform 0.15s, box-shadow 0.2s;
+}
+
+.elder-voice-btn:active { transform: scale(0.98); }
+
+.elder-voice-btn:hover {
+    box-shadow: 0 4px 16px rgba(26,115,232,0.15);
+}
+
+.elder-voice-icon-wrap {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--google-blue);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+    position: relative;
+    animation: elderVoicePulse 3s ease-in-out infinite;
+}
+
+@keyframes elderVoicePulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(26,115,232,0.3); }
+    50% { box-shadow: 0 0 0 10px rgba(26,115,232,0); }
+}
+
+.elder-voice-icon { font-size: 28px; color: #fff; }
+
+.elder-voice-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.elder-voice-text strong { font-size: 16px; color: var(--text-primary); }
+.elder-voice-text span { font-size: 13px; color: var(--text-secondary); }
+
+/* Spend Card (Large Elderly) */
+.elder-spend-card {
+    background: linear-gradient(135deg, #e8f0fe, #f1f3f4);
+    border: 1px solid #c8d6e5;
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 16px;
+}
+
+.elder-spend-card h3 { font-size: 16px; font-weight: 600; color: var(--text-primary); margin-bottom: 12px; }
+
+.elder-spend-amount {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: 12px;
+}
+
+.elder-spend-amount span { font-size: 18px; color: var(--text-secondary); font-weight: 500; }
+
+.elder-spend-remaining {
+    font-size: 14px;
+    color: var(--google-green);
+    font-weight: 600;
+    margin-top: 8px;
+}
+
+.elder-edit-limit {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 12px;
+    background: none;
+    border: none;
+    color: var(--google-blue);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+/* Elder Sections */
+.elder-section {
+    margin-bottom: 20px;
+}
+
+.elder-section-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.elder-section-header h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* Transaction List */
+.elder-txn-list, .elder-reviewer-list {
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    overflow: hidden;
+    background: var(--bg-light);
+}
+
+.elder-txn-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 8px;
+    padding: 24px;
+}
+
+.elder-txn-empty p { font-size: 13px; color: var(--text-secondary); line-height: 1.4; }
+
+.elder-txn-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border-color);
+    animation: fadeIn 0.3s ease;
+}
+
+.elder-txn-item:last-child { border-bottom: none; }
+
+.elder-txn-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    font-weight: 700;
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+.elder-txn-info { flex: 1; }
+.elder-txn-info strong { display: block; font-size: 14px; color: var(--text-primary); }
+.elder-txn-info span { font-size: 12px; color: var(--text-secondary); }
+
+.elder-txn-amount { font-size: 16px; font-weight: 700; white-space: nowrap; }
+.elder-txn-amount.sent { color: var(--google-red); }
+.elder-txn-amount.received { color: var(--google-green); }
+
+/* Reviewer Cards */
+.elder-reviewer-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.elder-reviewer-item:last-child { border-bottom: none; }
+
+.elder-reviewer-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: #34a853;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    font-weight: 700;
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+.elder-reviewer-info { flex: 1; }
+.elder-reviewer-info strong { display: block; font-size: 14px; color: var(--text-primary); }
+.elder-reviewer-info span { font-size: 12px; color: var(--text-secondary); }
+
+.elder-reviewer-badge {
+    font-size: 11px;
+    background: #e6f4ea;
+    color: var(--google-green);
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-weight: 600;
+}
+
+.elder-add-reviewer-btn {
+    width: 100%;
+    padding: 12px;
+    border: 2px dashed var(--border-color);
+    border-radius: 14px;
+    background: transparent;
+    color: var(--google-blue);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 12px;
+    transition: all 0.2s;
+}
+
+.elder-add-reviewer-btn:hover { background: var(--google-blue-bg); border-color: var(--google-blue); }
+
+/* Help Cards */
+.elder-help-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px;
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    cursor: pointer;
+    margin-bottom: 10px;
+    transition: all 0.2s;
+}
+
+.elder-help-card:hover { background: var(--surface-light); }
+.elder-help-card div strong { font-size: 14px; color: var(--text-primary); display: block; }
+.elder-help-card div span { font-size: 12px; color: var(--text-secondary); }
+
+/* ███ ELDERLY FONT SCALING ███ */
+.elderly-font-large .elder-voice-text strong,
+.elderly-font-large .elder-section-header h3 { font-size: 19px; }
+.elderly-font-large .elder-voice-text span,
+.elderly-font-large .elder-spend-remaining,
+.elderly-font-large .elder-txn-info strong,
+.elderly-font-large .elder-help-card div strong { font-size: 17px; }
+.elderly-font-large .elder-spend-amount { font-size: 34px; }
+.elderly-font-large .elder-spend-card h3 { font-size: 19px; }
+
+.elderly-font-small .elder-voice-text strong,
+.elderly-font-small .elder-section-header h3 { font-size: 14px; }
+.elderly-font-small .elder-spend-amount { font-size: 24px; }
