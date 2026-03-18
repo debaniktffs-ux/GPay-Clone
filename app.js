@@ -212,9 +212,11 @@ function toggleVoiceMute() {
 function saveState() {
     const state = {
         currentSpend,
+        monthlyLimit,
         bankBalance,
         transactionHistory,
-        savedReviewers
+        savedReviewers,
+        elderlyMode
     };
     localStorage.setItem('gpayCloneState', JSON.stringify(state));
 }
@@ -225,9 +227,11 @@ function loadState() {
         try {
             const state = JSON.parse(saved);
             if (state.currentSpend !== undefined) currentSpend = state.currentSpend;
+            if (state.monthlyLimit !== undefined) monthlyLimit = state.monthlyLimit;
             if (state.bankBalance !== undefined) bankBalance = state.bankBalance;
             if (state.transactionHistory) transactionHistory = state.transactionHistory;
             if (state.savedReviewers) savedReviewers = state.savedReviewers;
+            if (state.elderlyMode !== undefined) elderlyMode = state.elderlyMode;
         } catch (e) {
             console.error('Failed to parse saved state', e);
         }
@@ -239,6 +243,22 @@ function loadState() {
 // ═══════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', () => {
     loadState();
+    
+    // Apply layout state
+    if (elderlyMode) {
+        document.getElementById('elderly-toggle').checked = true;
+        const regularBody = document.getElementById('regular-body');
+        const elderlyBody = document.getElementById('elderly-body');
+        const title = document.getElementById('mode-title');
+        title.innerText = '🛡️ Guardian Pay';
+        title.classList.add('guardian');
+        regularBody.style.display = 'none';
+        elderlyBody.style.display = 'block';
+        updateElderlySpend();
+        renderElderlyTransactions();
+        renderElderlyReviewers();
+    }
+
     populatePeople();
     updateSpendBanner();
     setupPinAutoFocus();
@@ -300,6 +320,7 @@ function closeGPay() {
 // ═══════════════════════════════════════════
 function toggleElderlyMode() {
     elderlyMode = document.getElementById('elderly-toggle').checked;
+    saveState();
     const title = document.getElementById('mode-title');
     const regularBody = document.getElementById('regular-body');
     const elderlyBody = document.getElementById('elderly-body');
@@ -465,8 +486,9 @@ function closeSpendConfig() {
 }
 
 function saveSpendConfig() {
-    monthlyLimit = parseInt(document.getElementById('sc-limit-input').value) || 10000;
+    monthlyLimit = parseInt(document.getElementById('sc-limit-input').value) || 20000;
     currentSpend = parseInt(document.getElementById('sc-spend-input').value) || 0;
+    saveState();
     updateSpendBanner();
     closeSpendConfig();
     showToast('Spend limits updated ✓');
