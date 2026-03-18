@@ -79,7 +79,9 @@ const translations = {
         "What would you like to do?": "आप क्या करना चाहेंगे?",
         "💸 Make a Payment": "💸 भुगतान करें",
         "🏦 Check Bank Balance": "🏦 बैंक बैलेंस जांचें",
-        "Okay, please enter your PIN to view your balance.": "ठीक है, अपना बैलेंस देखने के लिए अपना पिन दर्ज करें।"
+        "Okay, please enter your PIN to view your balance.": "ठीक है, अपना बैलेंस देखने के लिए अपना पिन दर्ज करें।",
+        "Please enter the phone number or UPI ID you want to pay:": "कृपया वह फोन नंबर या UPI ID दर्ज करें जिसे आप भुगतान करना चाहते हैं:",
+        "🆕 New Number / UPI ID": "🆕 नया नंबर / UPI ID"
     },
     'bn-IN': {
         "👋 Hi! I'm your GPay Assistant. I'm here to help you make a payment step by step.": "নমস্কার! আমি আপনার জি-পে অ্যাসিস্ট্যান্ট। আমি আপনাকে পেমেন্ট করতে সাহায্য করব।",
@@ -98,7 +100,9 @@ const translations = {
         "What would you like to do?": "আপনি কী করতে চান?",
         "💸 Make a Payment": "💸 পেমেন্ট করুন",
         "🏦 Check Bank Balance": "🏦 ব্যাঙ্ক ব্যালেন্স দেখুন",
-        "Okay, please enter your PIN to view your balance.": "ঠিক আছে, আপনার ব্যালেন্স দেখতে আপনার পিন প্রবেশ করান।"
+        "Okay, please enter your PIN to view your balance.": "ঠিক আছে, আপনার ব্যালেন্স দেখতে আপনার পিন প্রবেশ করান।",
+        "Please enter the phone number or UPI ID you want to pay:": "অনুগ্রহ করে ফোন নম্বর বা ইউপিআই আইডি লিখুন যাকে আপনি পেমেন্ট করতে চান:",
+        "🆕 New Number / UPI ID": "🆕 নতুন নম্বর / ইউপিআই আইডি"
     }
 };
 
@@ -121,6 +125,7 @@ function tDynamic(type, val1, val2) {
             return confirmMsg;
         }
         if (type === 'balance_result') return `आपका बैंक बैलेंस ₹${val1.toLocaleString()} है।`;
+        if (type === 'new_payee_found') return `खोजा जा रहा है... <strong>${val1}</strong> का खाता मिला।`;
     }
     if (currentVoiceLang === 'bn-IN') {
         if (type === 'payee') return `দারুণ! আপনি <strong>${val1}</strong> কে পেমেন্ট করতে চান। 👍`;
@@ -133,6 +138,7 @@ function tDynamic(type, val1, val2) {
             return confirmMsg;
         }
         if (type === 'balance_result') return `আপনার ব্যাঙ্ক ব্যালেন্স হল ₹${val1.toLocaleString()}।`;
+        if (type === 'new_payee_found') return `খোঁজা হচ্ছে... <strong>${val1}</strong> এর অ্যাকাউন্ট পাওয়া গেছে।`;
     }
     // English
     if (type === 'payee') return `Great! You want to pay <strong>${val1}</strong>. 👍`;
@@ -145,6 +151,7 @@ function tDynamic(type, val1, val2) {
         return confirmMsg;
     }
     if (type === 'balance_result') return `Your bank balance is ₹${val1.toLocaleString()}.`;
+    if (type === 'new_payee_found') return `Searching... Found account for <strong>${val1}</strong>.`;
 }
 
 function speakText(text) {
@@ -681,6 +688,19 @@ function showPeopleOptions() {
         btn.onclick = () => selectPayee(p.name);
         optionsDiv.appendChild(btn);
     });
+
+    const newBtn = document.createElement('button');
+    newBtn.className = 'v-option-btn';
+    newBtn.innerText = t('🆕 New Number / UPI ID');
+    newBtn.onclick = () => {
+        addBubble('user', t('🆕 New Number / UPI ID'));
+        voiceStep = 'ask_new_payee';
+        setTimeout(() => {
+            addBubble('assistant', t('Please enter the phone number or UPI ID you want to pay:'));
+        }, 300);
+    };
+    optionsDiv.appendChild(newBtn);
+
     chat.appendChild(optionsDiv);
     chat.scrollTop = chat.scrollHeight;
 }
@@ -876,6 +896,13 @@ function sendUserMessage() {
                 showPeopleOptions();
             }, 300);
         }
+    } else if (voiceStep === 'ask_new_payee') {
+        setTimeout(() => {
+            addBubble('assistant', tDynamic('new_payee_found', text));
+            setTimeout(() => {
+                selectPayee(text);
+            }, 1000);
+        }, 800);
     } else if (voiceStep === 'ask_amount') {
         const numMatch = text.match(/\d+/);
         if (numMatch) {
@@ -964,6 +991,8 @@ function openReviewerFromVoice() {
         addBubble('assistant', t('🛡️ Great choice! I\'ll open the reviewer setup so you can add a trusted person to verify this transaction.'));
         setTimeout(() => {
             closeVoice();
+            pendingPayee = voiceSelectedPayee;
+            pendingAmount = voiceSelectedAmount;
             openReviewerSetup();
         }, 800);
     }, 300);
