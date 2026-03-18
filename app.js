@@ -62,8 +62,8 @@ let isVoiceMuted = false;
 let currentVoiceLang = 'en-IN';
 
 // Supabase Configuration (Placeholder - User needs to replace)
-const SUPABASE_URL = 'YOUR_SUPABASE_URL';
-const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+const SUPABASE_URL = 'https://rpmwmattppvgfbteidct.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_eyYpykciRHmcIbL9kFUmCw_dixh5pWw';
 
 // Only initialize if URL is provided and not placeholder
 const isSupabaseConfigured = SUPABASE_URL && SUPABASE_URL !== 'YOUR_SUPABASE_URL';
