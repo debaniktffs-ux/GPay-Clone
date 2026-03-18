@@ -1,6 +1,33 @@
 // gpay_clone_web/app.js — Phone Mockup Edition
 
 // ═══════════════════════════════════════════
+// PHONE HOME SCREEN → GPAY NAVIGATION
+// ═══════════════════════════════════════════
+function openGPay() {
+    console.log('openGPay called');
+    const home = document.getElementById('home-screen');
+    const app = document.getElementById('gpay-app');
+    
+    if (home && app) {
+        home.classList.add('hidden');
+        app.classList.add('active');
+        console.log('Classes adjusted: home hidden, app active');
+    } else {
+        console.error('Core elements not found', { home, app });
+    }
+}
+
+function closeGPay() {
+    const home = document.getElementById('home-screen');
+    const app = document.getElementById('gpay-app');
+    
+    if (app) app.classList.remove('active');
+    setTimeout(() => {
+        if (home) home.classList.remove('hidden');
+    }, 100);
+}
+
+// ═══════════════════════════════════════════
 // DATA
 // ═══════════════════════════════════════════
 const people = [
@@ -14,6 +41,22 @@ const people = [
     { name: 'Ankit R.', color: '#14b8a6' }
 ];
 
+// Supabase Configuration
+const SUPABASE_URL = 'https://rpmwmattppvgfbteidct.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_eyYpykciRHmcIbL9kFUmCw_dixh5pWw';
+
+let supabase = null;
+try {
+    const isSupabaseConfigured = SUPABASE_URL && !SUPABASE_URL.includes('YOUR_');
+    if (isSupabaseConfigured && typeof window.supabase !== 'undefined') {
+        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        console.log('Supabase client initialized ✓');
+    }
+} catch (e) {
+    console.error('Supabase init failed:', e);
+}
+const USER_ID = 'gpay_primary_user';
+
 // ═══════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════
@@ -25,7 +68,7 @@ let pendingAmount = 0;
 let pinMode = 'payment'; // 'payment' or 'balance'
 
 // Voice Assistant Conversation State
-let voiceStep = 'idle'; // idle, ask_who, ask_amount, ask_bank, confirm_all
+let voiceStep = 'idle'; 
 let voiceSelectedPayee = '';
 let voiceSelectedBank = '';
 
@@ -60,17 +103,6 @@ if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
 // Voice State
 let isVoiceMuted = false;
 let currentVoiceLang = 'en-IN';
-
-// Supabase Configuration (Placeholder - User needs to replace)
-const SUPABASE_URL = 'https://rpmwmattppvgfbteidct.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_eyYpykciRHmcIbL9kFUmCw_dixh5pWw';
-
-// Only initialize if URL is provided and not placeholder
-const isSupabaseConfigured = SUPABASE_URL && SUPABASE_URL !== 'YOUR_SUPABASE_URL';
-const supabase = (isSupabaseConfigured && typeof window.supabase !== 'undefined') 
-    ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) 
-    : null;
-const USER_ID = 'gpay_primary_user'; // Hardcoded for prototype persistence
 
 const translations = {
     'hi-IN': {
