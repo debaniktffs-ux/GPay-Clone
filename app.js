@@ -23,8 +23,20 @@ let pendingPayee = '';
 let pendingAmount = 0;
 
 // Voice Assistant Conversation State
-let voiceStep = 'idle'; // idle, ask_who, confirm_who, ask_amount, confirm_all
+let voiceStep = 'idle'; // idle, ask_who, ask_amount, ask_bank, confirm_all
 let voiceSelectedPayee = '';
+let voiceSelectedBank = '';
+
+// Bank Accounts
+const bankAccounts = [
+    { name: 'SBI Savings', suffix: '●●4521', upi: 'user@sbi' },
+    { name: 'HDFC Salary', suffix: '●●7890', upi: 'user@hdfc' },
+    { name: 'ICICI Savings', suffix: '●●3214', upi: 'user@icici' }
+];
+
+// Reviewer State
+let pendingReviewTransaction = null;
+let savedReviewer = null;
 let voiceSelectedAmount = 0;
 
 // Speech Recognition
@@ -270,12 +282,40 @@ function selectPayee(name) {
 function selectAmount(amount) {
     voiceSelectedAmount = amount;
     addBubble('user', `₹${amount}`);
+    voiceStep = 'ask_bank';
+
+    setTimeout(() => {
+        addBubble('assistant', `₹${amount.toLocaleString()} — got it! 👍`);
+        setTimeout(() => {
+            addBubble('assistant', 'Which bank account would you like to pay from?');
+            showBankOptions();
+        }, 600);
+    }, 300);
+}
+
+function showBankOptions() {
+    const chat = document.getElementById('voice-chat');
+    const optionsDiv = document.createElement('div');
+    optionsDiv.className = 'v-bubble options';
+    bankAccounts.forEach(bank => {
+        const btn = document.createElement('button');
+        btn.className = 'v-option-btn';
+        btn.innerText = `${bank.name} (${bank.suffix})`;
+        btn.onclick = () => selectBank(bank);
+        optionsDiv.appendChild(btn);
+    });
+    chat.appendChild(optionsDiv);
+    chat.scrollTop = chat.scrollHeight;
+}
+
+function selectBank(bank) {
+    voiceSelectedBank = `${bank.name} (${bank.suffix})`;
+    addBubble('user', voiceSelectedBank);
     voiceStep = 'confirm_all';
 
     setTimeout(() => {
-        // Check spend limit
-        const willExceed = currentSpend + amount > monthlyLimit;
-        let confirmMsg = `Let me confirm:<br><br>📤 <strong>Pay ${voiceSelectedPayee}</strong><br>💰 <strong>₹${amount.toLocaleString()}</strong>`;
+        const willExceed = currentSpend + voiceSelectedAmount > monthlyLimit;
+        let confirmMsg = `Let me confirm:<br><br>📤 <strong>Pay ${voiceSelectedPayee}</strong><br>💰 <strong>₹${voiceSelectedAmount.toLocaleString()}</strong><br>🏦 <strong>From: ${voiceSelectedBank}</strong>`;
 
         if (willExceed) {
             confirmMsg += `<br><br>⚠️ <em>Warning: This will exceed your monthly limit of ₹${monthlyLimit.toLocaleString()}</em>`;
@@ -284,18 +324,26 @@ function selectAmount(amount) {
         addBubble('assistant', confirmMsg);
 
         setTimeout(() => {
-            addBubble('assistant', 'Shall I proceed with this payment?');
+            addBubble('assistant', 'How would you like to proceed?');
             const chat = document.getElementById('voice-chat');
             const optionsDiv = document.createElement('div');
             optionsDiv.className = 'v-bubble options';
 
             const yesBtn = document.createElement('button');
             yesBtn.className = 'v-option-btn';
-            yesBtn.innerText = '✅ Yes, Pay';
+            yesBtn.innerText = '✅ Pay Now';
             yesBtn.style.background = '#1a73e8';
             yesBtn.style.color = '#fff';
             yesBtn.style.border = 'none';
             yesBtn.onclick = () => confirmVoicePayment();
+
+            const reviewBtn = document.createElement('button');
+            reviewBtn.className = 'v-option-btn';
+            reviewBtn.innerText = '👥 Get it Reviewed';
+            reviewBtn.style.background = '#34a853';
+            reviewBtn.style.color = '#fff';
+            reviewBtn.style.border = 'none';
+            reviewBtn.onclick = () => openReviewerFromVoice();
 
             const noBtn = document.createElement('button');
             noBtn.className = 'v-option-btn';
@@ -303,6 +351,7 @@ function selectAmount(amount) {
             noBtn.onclick = () => cancelVoicePayment();
 
             optionsDiv.appendChild(yesBtn);
+            optionsDiv.appendChild(reviewBtn);
             optionsDiv.appendChild(noBtn);
             chat.appendChild(optionsDiv);
             chat.scrollTop = chat.scrollHeight;
@@ -396,6 +445,16 @@ function sendUserMessage() {
                 showAmountOptions();
             }, 300);
         }
+    } else if (voiceStep === 'ask_bank') {
+        const matched = bankAccounts.find(b => b.name.toLowerCase().includes(text.toLowerCase()));
+        if (matched) {
+            selectBank(matched);
+        } else {
+            setTimeout(() => {
+                addBubble('assistant', 'Please choose a bank account from the options below:');
+                showBankOptions();
+            }, 300);
+        }
     } else {
         setTimeout(() => {
             addBubble('assistant', 'Would you like to make a payment? Let me help you get started.');
@@ -451,6 +510,133 @@ function stopListening() {
     isListening = false;
     document.getElementById('v-mic-btn')?.classList.remove('listening');
     try { recognition?.stop(); } catch (e) {}
+}
+
+// ═══════════════════════════════════════════
+// REVIEWER APPROVAL FLOW
+// ═══════════════════════════════════════════
+function openReviewerFromVoice() {
+    addBubble('user', 'Get it reviewed');
+    voiceStep = 'idle';
+
+    setTimeout(() => {
+        addBubble('assistant', '🛡️ Great choice! I\'ll open the reviewer setup so you can add a trusted person to verify this transaction.');
+        setTimeout(() => {
+            closeVoice();
+            openReviewerSetup();
+        }, 800);
+    }, 300);
+}
+
+function openReviewerSetup() {
+    // Populate transaction summary in the form
+    document.getElementById('rtxn-payee').innerText = voiceSelectedPayee || pendingPayee || '—';
+    document.getElementById('rtxn-amount').innerText = `₹${(voiceSelectedAmount || pendingAmount || 0).toLocaleString()}`;
+    document.getElementById('rtxn-bank').innerText = voiceSelectedBank || 'Default Account';
+
+    // Pre-fill reviewer if saved
+    if (savedReviewer) {
+        document.getElementById('rev-name').value = savedReviewer.name || '';
+        document.getElementById('rev-phone').value = savedReviewer.phone || '';
+        document.getElementById('rev-upi').value = savedReviewer.upi || '';
+        document.getElementById('rev-relation').value = savedReviewer.relation || '';
+    }
+
+    document.getElementById('reviewer-overlay').classList.add('active');
+}
+
+function closeReviewerSetup() {
+    document.getElementById('reviewer-overlay').classList.remove('active');
+}
+
+function sendForReview() {
+    const name = document.getElementById('rev-name').value.trim();
+    const phone = document.getElementById('rev-phone').value.trim();
+    const upi = document.getElementById('rev-upi').value.trim();
+    const relation = document.getElementById('rev-relation').value;
+
+    if (!name) { showToast('Please enter the reviewer\'s name'); return; }
+    if (!phone) { showToast('Please enter the reviewer\'s phone number'); return; }
+    if (!relation) { showToast('Please select a relation'); return; }
+
+    // Save reviewer for future use
+    savedReviewer = { name, phone, upi, relation };
+
+    // Create the pending review transaction
+    pendingReviewTransaction = {
+        payee: voiceSelectedPayee || pendingPayee,
+        amount: voiceSelectedAmount || pendingAmount,
+        bank: voiceSelectedBank || 'Default Account',
+        reviewer: { name, phone, upi, relation },
+        status: 'pending'
+    };
+
+    closeReviewerSetup();
+    openPendingReview();
+}
+
+function openPendingReview() {
+    if (!pendingReviewTransaction) return;
+    const txn = pendingReviewTransaction;
+
+    document.getElementById('pending-reviewer-name').innerText = txn.reviewer.name;
+    document.getElementById('pending-reviewer-relation').innerText = txn.reviewer.relation;
+    document.getElementById('pending-payee').innerText = txn.payee;
+    document.getElementById('pending-amount').innerText = `₹${txn.amount.toLocaleString()}`;
+    document.getElementById('pending-bank').innerText = txn.bank;
+
+    document.getElementById('pending-overlay').classList.add('active');
+    showToast(`Review request sent to ${txn.reviewer.name} 📩`);
+}
+
+function cancelPendingReview() {
+    document.getElementById('pending-overlay').classList.remove('active');
+    pendingReviewTransaction = null;
+    showToast('Transaction cancelled');
+}
+
+function simulateReviewerResponse() {
+    document.getElementById('pending-overlay').classList.remove('active');
+
+    // Open the reviewer's approval screen
+    setTimeout(() => {
+        openApprovalScreen();
+    }, 300);
+}
+
+function openApprovalScreen() {
+    if (!pendingReviewTransaction) return;
+    const txn = pendingReviewTransaction;
+
+    document.getElementById('approval-reviewer-name').innerText = txn.reviewer.name;
+    document.getElementById('approval-reviewer-relation').innerText = txn.reviewer.relation;
+    document.getElementById('approval-payee').innerText = txn.payee;
+    document.getElementById('approval-amount').innerText = `₹${txn.amount.toLocaleString()}`;
+    document.getElementById('approval-bank').innerText = txn.bank;
+    document.getElementById('approval-sender-avatar').innerText = 'U';
+
+    document.getElementById('approval-overlay').classList.add('active');
+}
+
+function approveTransaction() {
+    document.getElementById('approval-overlay').classList.remove('active');
+    showToast(`✅ ${pendingReviewTransaction.reviewer.name} approved the transaction!`);
+
+    // Now open the 2FA PIN for the user to finalize
+    setTimeout(() => {
+        pendingPayee = pendingReviewTransaction.payee;
+        pendingAmount = pendingReviewTransaction.amount;
+        open2FA(pendingPayee, pendingAmount);
+        pendingReviewTransaction = null;
+    }, 1000);
+}
+
+function rejectTransaction() {
+    document.getElementById('approval-overlay').classList.remove('active');
+    const reviewerName = pendingReviewTransaction?.reviewer?.name || 'Reviewer';
+    pendingReviewTransaction = null;
+
+    showToast(`❌ ${reviewerName} rejected the transaction`);
 }
 
 // ═══════════════════════════════════════════

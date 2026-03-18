@@ -271,6 +271,121 @@
                 </div>
             </div>
 
+            <!-- ███ REVIEWER SETUP MODAL ███ -->
+            <div class="reviewer-overlay" id="reviewer-overlay">
+                <div style="flex:1;" onclick="closeReviewerSetup()"></div>
+                <div class="reviewer-sheet">
+                    <div class="voice-drag"></div>
+                    <div class="reviewer-header">
+                        <span class="material-icons-round" style="color:#1a73e8; font-size:24px;">supervised_user_circle</span>
+                        <h2>Get Transaction Reviewed</h2>
+                    </div>
+                    <p class="reviewer-desc">Add a trusted person to review and approve this transaction before it's processed.</p>
+
+                    <div class="reviewer-txn-summary" id="reviewer-txn-summary">
+                        <div class="rtxn-row"><span>To:</span><strong id="rtxn-payee">—</strong></div>
+                        <div class="rtxn-row"><span>Amount:</span><strong id="rtxn-amount">—</strong></div>
+                        <div class="rtxn-row"><span>From:</span><strong id="rtxn-bank">—</strong></div>
+                    </div>
+
+                    <div class="reviewer-form">
+                        <label>Reviewer Name</label>
+                        <input type="text" id="rev-name" placeholder="e.g. Mom, Dad, Ravi">
+
+                        <label>Phone Number</label>
+                        <input type="tel" id="rev-phone" placeholder="+91 98765 43210">
+
+                        <label>UPI ID</label>
+                        <input type="text" id="rev-upi" placeholder="reviewer@upi">
+
+                        <label>Relation</label>
+                        <select id="rev-relation">
+                            <option value="">Select relation...</option>
+                            <option value="Parent">Parent</option>
+                            <option value="Spouse">Spouse</option>
+                            <option value="Sibling">Sibling</option>
+                            <option value="Child">Child</option>
+                            <option value="Friend">Friend</option>
+                            <option value="Guardian">Guardian</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <button class="reviewer-send-btn" onclick="sendForReview()">
+                        <span class="material-icons-round" style="font-size:20px;">send</span>
+                        Send for Review
+                    </button>
+                    <button class="reviewer-cancel-btn" onclick="closeReviewerSetup()">Cancel</button>
+                </div>
+            </div>
+
+            <!-- ███ PENDING REVIEW SCREEN ███ -->
+            <div class="pending-overlay" id="pending-overlay">
+                <div style="flex:1;"></div>
+                <div class="pending-sheet">
+                    <div class="voice-drag"></div>
+                    <div class="pending-icon-wrap">
+                        <div class="pending-pulse"></div>
+                        <span class="material-icons-round pending-icon">hourglass_top</span>
+                    </div>
+                    <h2 class="pending-title">Awaiting Review</h2>
+                    <p class="pending-desc">Your transaction has been sent to <strong id="pending-reviewer-name">—</strong> (<span id="pending-reviewer-relation">—</span>) for review.</p>
+
+                    <div class="pending-txn-card">
+                        <div class="rtxn-row"><span>To:</span><strong id="pending-payee">—</strong></div>
+                        <div class="rtxn-row"><span>Amount:</span><strong id="pending-amount">—</strong></div>
+                        <div class="rtxn-row"><span>From:</span><strong id="pending-bank">—</strong></div>
+                        <div class="rtxn-row"><span>Status:</span><strong class="pending-status-badge">⏳ Pending</strong></div>
+                    </div>
+
+                    <p class="pending-note">They will receive a notification shortly. You'll be notified once reviewed.</p>
+
+                    <button class="reviewer-send-btn" onclick="simulateReviewerResponse()" style="background:#34a853;">
+                        <span class="material-icons-round" style="font-size:20px;">notifications_active</span>
+                        Simulate Reviewer Response
+                    </button>
+                    <button class="reviewer-cancel-btn" onclick="cancelPendingReview()">Cancel Transaction</button>
+                </div>
+            </div>
+
+            <!-- ███ REVIEWER APPROVAL SCREEN ███ -->
+            <div class="approval-overlay" id="approval-overlay">
+                <div style="flex:1;"></div>
+                <div class="approval-sheet">
+                    <div class="voice-drag"></div>
+                    <div class="approval-header">
+                        <span class="material-icons-round" style="color:#1a73e8; font-size:28px;">verified_user</span>
+                        <h2>Review Transaction</h2>
+                        <p class="approval-sub">As <strong id="approval-reviewer-name">—</strong> (<span id="approval-reviewer-relation">—</span>)</p>
+                    </div>
+
+                    <div class="approval-txn-card">
+                        <div class="approval-sender">
+                            <div class="approval-sender-avatar" id="approval-sender-avatar">U</div>
+                            <div>
+                                <strong>User</strong> wants to send
+                            </div>
+                        </div>
+                        <div class="approval-details">
+                            <div class="rtxn-row"><span>To:</span><strong id="approval-payee">—</strong></div>
+                            <div class="rtxn-row"><span>Amount:</span><strong id="approval-amount" class="approval-amt">—</strong></div>
+                            <div class="rtxn-row"><span>From:</span><strong id="approval-bank">—</strong></div>
+                        </div>
+                    </div>
+
+                    <div class="approval-actions">
+                        <button class="approval-btn reject" onclick="rejectTransaction()">
+                            <span class="material-icons-round">close</span>
+                            Reject
+                        </button>
+                        <button class="approval-btn approve" onclick="approveTransaction()">
+                            <span class="material-icons-round">check</span>
+                            Approve
+                        </button>
+                    </div>
+                </div>
+            </div>
+
             <!-- Toast -->
             <div id="toast" class="gpay-toast">
                 <span class="material-icons-round" style="font-size:18px;">check_circle</span>
