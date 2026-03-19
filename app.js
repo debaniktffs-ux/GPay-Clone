@@ -29,6 +29,8 @@ try {
     console.error('Supabase init failed:', e);
 }
 const USER_ID = 'gpay_primary_user';
+let stateLoaded = false; // Guard: never save state before we've loaded it from DB
+
 
 // ═══════════════════════════════════════════
 // STATE
@@ -226,6 +228,11 @@ function toggleVoiceMute() {
 // PERSISTENCE (Supabase Backend)
 // ═══════════════════════════════════════════
 async function saveState() {
+    // Don't overwrite the database with default empty state before we've loaded
+    if (!stateLoaded) {
+        console.log('saveState skipped — state not yet loaded from DB');
+        return;
+    }
     const state = {
         currentSpend,
         monthlyLimit,
@@ -264,6 +271,7 @@ async function loadState() {
 
             if (data && data.data) {
                 applyState(data.data);
+                stateLoaded = true;
                 console.log('State loaded from Supabase ✓');
                 return;
             }
@@ -284,6 +292,7 @@ async function loadState() {
             console.error('Failed to parse saved state', e);
         }
     }
+    stateLoaded = true; // Even if nothing was loaded, allow saves going forward
 }
 
 function applyState(state) {
