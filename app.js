@@ -307,11 +307,19 @@ document.addEventListener('DOMContentLoaded', () => {
     // 2. Load from database (async in background)
     loadState().then(() => {
         console.log('Background state sync complete.');
+        
+        // RE-SYNC ALL UI COMPONENTS
+        updateSpendBanner();
+        updateElderlySpend();
+        renderElderlyTransactions();
+        renderElderlyReviewers();
+
         // Re-apply if elderlyMode changed
         if (elderlyMode) {
             document.getElementById('elderly-toggle').checked = true;
             toggleElderlyModeUI(true);
         }
+
         if (currentSpend > monthlyLimit) {
             const exceededBy = currentSpend - monthlyLimit;
             setTimeout(() => {
