@@ -16,7 +16,7 @@ const people = [
 
 // Supabase Configuration
 const SUPABASE_URL = 'https://rpmwmattppvgfbteidct.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_eyYpykciRHmcIbL9kFUmCw_dixh5pWw';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJwbXdtYXR0cHB2Z2ZidGVpZGN0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NzY1NTcsImV4cCI6MjA4OTQ1MjU1N30.Ho9apWSYC4vsKb0-E4s3wWvaqRdiwpa6TPO3r1OcXTU';
 
 let supabaseClient = null;
 try {
